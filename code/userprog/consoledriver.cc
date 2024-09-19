@@ -24,7 +24,8 @@ ConsoleDriver::~ConsoleDriver()
 
 void ConsoleDriver::PutChar(int ch)
 {
-// ...
+    console->TX (ch);      // echo it!
+    writeDone->P ();       // wait for write to finish
 }
 int ConsoleDriver::GetChar()
 {
