@@ -132,6 +132,18 @@ main (int argc, char **argv)
                       argCount = 3;
                   }
             }
+            #ifdef CHANGED
+            else if (!strcmp (*argv, "-sc")){
+              if (argc == 1)
+                    ConsoleDriverTest (NULL, NULL);
+                else
+                  {
+                      ASSERT_MSG (argc > 2, "-c needs two file names\n");
+                      ConsoleDriverTest (*(argv + 1), *(argv + 2));
+                      argCount = 3;
+                  }
+            }
+            #endif
 #endif // USER_PROGRAM
 #ifdef FILESYS
           if (!strcmp (*argv, "-cp"))
