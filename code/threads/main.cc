@@ -138,7 +138,7 @@ main (int argc, char **argv)
                     ConsoleDriverTest (NULL, NULL);
                 else
                   {
-                      ASSERT_MSG (argc > 2, "-c needs two file names\n");
+                      ASSERT_MSG (argc > 2, "-sc needs two file names\n");
                       ConsoleDriverTest (*(argv + 1), *(argv + 2));
                       argCount = 3;
                   }

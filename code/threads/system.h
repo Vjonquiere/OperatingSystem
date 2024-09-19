@@ -50,4 +50,11 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+#include "consoledriver.h"
+extern ConsoleDriver *consoledriver;
+#endif
+#endif
+
 #endif // SYSTEM_H
