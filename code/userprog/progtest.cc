@@ -99,7 +99,10 @@ ConsoleTest (const char *in, const char *out)
           if (ch == 'q'|| ch == EOF) {
               printf ("Au revoir\n");
               break;                // if q, quit
-          }else{
+          }else if (ch == '\n'){
+            console->TX (ch);
+            writeDone->P ();
+        }else{
             console->TX ('<');
             writeDone->P ();
             console->TX (ch);
@@ -129,9 +132,13 @@ ConsoleDriverTest (const char *in, const char *out)
     char ch;
     ConsoleDriver *test_consoledriver = new ConsoleDriver(in, out);
     while ((ch = test_consoledriver->GetChar()) != EOF){
-        test_consoledriver->PutChar('<');
-        test_consoledriver->PutChar(ch);
-        test_consoledriver->PutChar('>');
+        if (ch == '\n'){
+            test_consoledriver->PutChar(ch);
+        }else{
+            test_consoledriver->PutChar('<');
+            test_consoledriver->PutChar(ch);
+            test_consoledriver->PutChar('>');
+        }
     }
         
     fprintf(stderr, "EOF detected in ConsoleDriver!\n");
