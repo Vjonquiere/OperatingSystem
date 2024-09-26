@@ -3,6 +3,7 @@
 #include "system.h"
 #include "consoledriver.h"
 #include "synch.h"
+#include "utils.h"
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 static void ReadAvailHandler(void *arg) { (void) arg; readAvail->V(); }
@@ -34,7 +35,14 @@ int ConsoleDriver::GetChar()
 }
 void ConsoleDriver::PutString(const char *s)
 {
-// ...
+    if(s == NULL){
+        DEBUG('t',"tried to putstring a null string");
+    }
+    while (*s != '\0')
+    {
+        PutChar(*s);
+        s++;
+    }
 }
 void ConsoleDriver::GetString(char *s, int n)
 {
