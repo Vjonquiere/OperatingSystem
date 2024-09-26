@@ -2,9 +2,9 @@
 
 void print(char *c)
 {
-#if 0
+
 PutString("abcd");
-#endif
+
 }
 int
 main()

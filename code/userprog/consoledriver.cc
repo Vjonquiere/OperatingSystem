@@ -36,7 +36,7 @@ int ConsoleDriver::GetChar()
 void ConsoleDriver::PutString(const char *s)
 {
     if(s == NULL){
-        DEBUG('t',"tried to putstring a null string");
+        DEBUG('s',"tried to putstring a null string");
     }
     while (*s != '\0')
     {
