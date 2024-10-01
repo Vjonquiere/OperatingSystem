@@ -25,6 +25,10 @@
 #include "system.h"
 #include "syscall.h"
 
+#ifdef CHANGED
+#include "utils.h"
+#endif
+
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -87,6 +91,20 @@ ExceptionHandler (ExceptionType which)
                   {
                     DEBUG ('s', "PutChar\n");
                     consoledriver->PutChar (machine->ReadRegister(4));
+                    break;
+                  }
+                case SC_PutString:
+                  {
+                    DEBUG ('s', "PutString\n");
+                    unsigned int charRead =MAX_STRING_SIZE;
+                    char* buffer= (char*)malloc(sizeof(char)*MAX_STRING_SIZE);
+                    int addressString = machine->ReadRegister(4);
+                    while(charRead == MAX_STRING_SIZE){
+                      charRead = copyStringFromMachine(addressString,buffer,MAX_STRING_SIZE);
+                      consoledriver->PutString (buffer);
+                      addressString+=MAX_STRING_SIZE-1;
+                    }
+                    free(buffer);
                     break;
                   }
                 #endif
