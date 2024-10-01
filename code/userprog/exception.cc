@@ -98,9 +98,11 @@ ExceptionHandler (ExceptionType which)
                     DEBUG ('s', "PutString\n");
                     unsigned int charRead =MAX_STRING_SIZE;
                     char* buffer= (char*)malloc(sizeof(char)*MAX_STRING_SIZE);
+                    int addressString = machine->ReadRegister(4);
                     while(charRead == MAX_STRING_SIZE){
-                      charRead = copyStringFromMachine(machine->ReadRegister(4),buffer,MAX_STRING_SIZE);
+                      charRead = copyStringFromMachine(addressString,buffer,MAX_STRING_SIZE);
                       consoledriver->PutString (buffer);
+                      addressString+=MAX_STRING_SIZE-1;
                     }
                     free(buffer);
                     break;

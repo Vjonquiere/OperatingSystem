@@ -20,6 +20,7 @@ unsigned copyStringFromMachine(int from, char *to, unsigned size){
             break;
         }
     }
+    free(tmp);
     return i;
 }
 
