@@ -89,6 +89,13 @@ ExceptionHandler (ExceptionType which)
                     consoledriver->PutChar (machine->ReadRegister(4));
                     break;
                   }
+                case SC_Exit:
+                  {
+                    DEBUG ('s', "Shutdown, initiated by user program.\n");
+                    DEBUG ('s', "Main return: %d\n", machine->ReadRegister(4));
+                    interrupt->Powerdown ();
+                    break;
+                  }
                 #endif
                 default:
                   {
