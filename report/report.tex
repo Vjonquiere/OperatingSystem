@@ -31,5 +31,13 @@
 
 \section{Tests}
 
+\section{Brouillon}
+\subsection{Partie VI}
+\begin{itemize}
+    \item Message d'erreur `Unimplemented system call 1`, car l'appel SC\_Exit n'est pas implémenté. On se sert de SC\_Halt pour arrêter la machine.
+    On peut dupliquer l'effet de SC\_Halt dans SC\_Exit afin de ne plus à avoir à l'appeler.
+    \item Changement de registre dans Start.s pour recupérer la valeur de retour
+    \item Que faire de la valeur de retour ??
+\end{itemize}
 
 \end{document}
