@@ -92,7 +92,7 @@ ExceptionHandler (ExceptionType which)
                 case SC_Exit:
                   {
                     DEBUG ('s', "Shutdown, initiated by user program.\n");
-                    DEBUG ('s', "Main return: %d\n", machine->ReadRegister(4));
+                    printf("Main return: %d\n", machine->ReadRegister(4)); // ?
                     interrupt->Powerdown ();
                     break;
                   }
