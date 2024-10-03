@@ -93,6 +93,13 @@ ExceptionHandler (ExceptionType which)
                     consoledriver->PutChar (machine->ReadRegister(4));
                     break;
                   }
+                case SC_GetChar:
+                  {
+                    DEBUG ('s', "GetChar\n");
+                    machine->WriteRegister(2, consoledriver->GetChar ());
+                    DEBUG ('s', "written char %d\n", machine->ReadRegister(2));
+                    break;
+                  }
                 case SC_Exit:
                   {
                     DEBUG ('s', "Shutdown, initiated by user program.\n");
@@ -111,6 +118,16 @@ ExceptionHandler (ExceptionType which)
                       consoledriver->PutString (buffer);
                       addressString+=MAX_STRING_SIZE-1;
                     }
+                    free(buffer);
+                    break;
+                  }
+                case SC_GetString:
+                  {
+                    DEBUG ('s', "GetString\n");
+                    char* buffer = (char*)malloc(sizeof(char)*machine->ReadRegister(5));
+                    consoledriver->GetString(buffer, machine->ReadRegister(5));
+                    copyStringToMachine(buffer, machine->ReadRegister(4), machine->ReadRegister(5));
+                    consoledriver->PutString (buffer);
                     free(buffer);
                     break;
                   }

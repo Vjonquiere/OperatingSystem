@@ -46,6 +46,21 @@ void ConsoleDriver::PutString(const char *s)
 }
 void ConsoleDriver::GetString(char *s, int n)
 {
-// ...
+ if (s == NULL){
+    DEBUG('s',"tried to get a null string");
+ }
+ for (int i = 0; i<n; i++){
+    int c = GetChar();
+    if (c == EOF){
+        break;
+    }
+    if (c == '\n'){
+        *s = c;
+        break;
+    }
+    *s = c;
+    s++;
+ }
+ *s='\0';
 }
 #endif // CHANGED

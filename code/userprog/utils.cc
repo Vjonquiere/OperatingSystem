@@ -24,4 +24,21 @@ unsigned copyStringFromMachine(int from, char *to, unsigned size){
     return i;
 }
 
+unsigned copyStringToMachine(char* from, int to, unsigned size){
+    if(from == NULL){
+        DEBUG('t',"tried to copyStringFromMachine with a null pointer");
+    }
+    unsigned int i;
+    for( i=0; i< size; i++){
+        if(i == size-1){
+            machine->WriteMem(to, 1, '\0');
+        }else{
+            machine->WriteMem(to, 1, *from);
+            to++;
+            from++;
+        }
+    }
+    return i;
+}
+
 #endif
