@@ -10,11 +10,6 @@ void print(char c, int n)
 int
 main()
 {
-    print('a',4);
-    Halt();
+print('a',4);
+return 1;
 }
-/*
-To lauch the test, go in the code folder and execute the makefile with the command make.
-then execute the following command:
-./userprog/nachos -x test/putchar
-*/
