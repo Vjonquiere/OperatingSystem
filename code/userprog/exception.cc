@@ -99,6 +99,7 @@ ExceptionHandler (ExceptionType which)
                     printf("Main return: %d\n", machine->ReadRegister(4)); // ?
                     interrupt->Powerdown ();
                     break;
+                  }
                 case SC_PutString:
                   {
                     DEBUG ('s', "PutString\n");
