@@ -31,7 +31,8 @@ void ConsoleDriver::PutChar(int ch)
 int ConsoleDriver::GetChar()
 {
     readAvail->P ();        // wait for character to arrive
-    return console->RX ();
+    int redChar = console->RX ();
+    return redChar == EOF ? 0 : redChar ;
 }
 void ConsoleDriver::PutString(const char *s)
 {
@@ -49,7 +50,7 @@ void ConsoleDriver::GetString(char *s, int n)
  if (s == NULL){
     DEBUG('s',"tried to get a null string");
  }
- for (int i = 0; i<n; i++){
+ for (int i = 0; i<n-1; i++){
     int c = GetChar();
     if (c == EOF){
         break;
