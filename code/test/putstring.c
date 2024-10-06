@@ -2,15 +2,16 @@
 
 void testPutString()
 {
-PutString("a");
-PutString("abcd");
-PutString("1234567");
+PutString("a\n");
+PutString("abcd\n");
+PutString("123456\n");
 PutString("");
-PutString("String longer than the buffer.");
-PutString("123456789");
-PutString("Notre appel système ne sait pas bien gérer les accents!");
-PutString("12345678");
-PutString("test char spéciaux : € $ £ µ @ § ");
+PutString("test char spéciaux : € $ £ µ @ § \n");
+PutString("String longer than the buffer.\n");
+PutString("123456789\n");
+PutString("Notre appel système ne sait pas bien gérer les accents!\n");
+PutString("12345678\n");
+
 
 }
 int
@@ -23,7 +24,7 @@ Halt();
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
 then execute the following command:
-./userprog/nachos -x test/putchar
+./userprog/nachos -x test/putstring
 
 To test our new syscall PutString, we implemented a function called testPutString.
 We have tested different cases that could be problematic if we made mistakes in our code.
