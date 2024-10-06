@@ -22,17 +22,16 @@
 
 \section{Bilan}
 
-Pour ce premier projet, nous avons décidé de tout faire les 4 premières parties ensemble afin de
-s'habituer à utiliser NACHOS et mieux se répartir le travail sur les Parties plus chronophages.
-Ces parties ne posant pas de problèmes, car elles étaient détaillées pas à pas dans le sujet, elles n'ont
-donc pas posé de problèmes particuliers et sont implémentés sans bug connu de notre part. Nous avons donc choisi
+Pour ce premier projet, nous avons décidé de faire les 4 premières parties ensemble afin de
+s'habituer à utiliser NACHOS et mieux se répartir le travail sur les parties plus chronophages.
+Ces parties ne posant pas de problèmes, car elles étaient détaillées pas à pas dans le sujet, sont implémentés sans bug connu de notre part. Nous avons donc choisi
 d'axer ce rapport sur les parties V, VI, VII et VIII qui nous ont posé plusieurs problèmes et demandé des choix 
 d'implémentation non triviaux. 
 \linebreak
 \begin{itemize}
     \item Dans la partie V, nous avons remarqué que notre implémentation ne prend pas en compte les caractères spéciaux dans la fonction \textit{PutString} si ceux-ci
     sont entrés 'en dur' dans chaîne de caractères.
-    \item Lors de l'implémentation de la partie VIII, tous les tests que nous avons mis en place fournissent les résultats attendus. Cependant, il y a de forte 
+    \item Lors de l'implémentation de la partie VIII, tous les tests que nous avons mis en place fournissent les résultats attendus. Cependant, il y a de fortes 
     chances que nous ayons omis des cas qui pourraient casser notre code.
     \item Notre fonction \textit{printf} ne gère pas non plus les caractères spéciaux.
 \end{itemize}
@@ -75,10 +74,10 @@ facilement.
 
 Lors de la création de l'appel système \textit{PutString}, nous nous sommes
 demandés quelle taille devait faire le buffer que nous utilisons pour copier la
-chaine de caractères. Nous avons choisi 8 pour pouvoir facilement se rendre
-compte s'il y a un problème lorsque l'on copie une chaine de caractères plus
+chaîne de caractères. Nous avons choisi 8 pour pouvoir facilement se rendre
+compte s'il y a un problème lorsque l'on copie une chaîne de caractères plus
 longue que le buffer. Si nous n'avions pas fixé de taille pour le buffer et
-fait en fonction de la taille de la chaine, nous aurions pu avoir plus de
+fait en fonction de la taille de la chaîne, nous aurions pu avoir plus de
 fragmentation de mémoire (même si nous ne nous en soucions pas encore) et cela
 aurait surtout rendu le code plus compliqué et la découverte d'erreurs et de
 dépassement de mémoire vraiment difficile.
@@ -93,7 +92,7 @@ mais 0 (qui correspond au caractère \textit{NULL} et corrige l'affichage).
 
 L'action nous ayant pris le plus de temps en réflexion dans cette partie est
 surement la fonction \textit{copyStringToMachine}. En effet, nous avons cherché
-un maximum de cas spécifique dans lesquels notre fonction pourrait écrire à des
+un maximum de cas spécifiques dans lesquels notre fonction pourrait écrire à des
 endroits indésirés. Cependant, nous avons tout de même eu des problèmes après
 implémentation, car \textit{Valgrind} nous indiquait des écritures illégales.
 Nous avons donc rapidement vu que \textit{copyStringToMachine} n'était pas la
@@ -107,7 +106,7 @@ Nous avons choisi qu'un nombre pourrait faire au maximum 12 caractères (variabl
 \textit{consoleDriver.h}). En effet, l'entier maximum
 étant composé de 10 chiffres, nous avons conservé deux caractères supplémentaires afin de pouvoir stocker
 le signe \textit{'-'} si celui est négatif ainsi que le caractère \textit{'\textbackslash0'} pour clôturer correctement
-la chaine. Lors de la lecture d'un entier avec \textit{GetInt}, si aucun entier n'est reconnu par
+la chaîne. Lors de la lecture d'un entier avec \textit{GetInt}, si aucun entier n'est reconnu par
 \textit{sscanf} nous avons choisi de garder sa valeur dans le buffer (0) et donc d'affecter la valeur 0 à l'adresse
 donnée par l'utilisateur.
 
@@ -143,7 +142,7 @@ utilisé par notre programme pour faire une action spécifique si la fonction \t
 Dans cette partie il a fallu faire plusieurs choix d'implémentation :
 \begin{itemize}
     \item Lors de l'appel de \textit{getString} l'utilisateur doit fournir un pointeur où
-          stocker sa chaine de caractères ainsi que la taille de cette chaine \linebreak
+          stocker sa chaîne de caractères ainsi que la taille de cette chaîne \linebreak
           (\textit{void GetString(char *s, int n)}). Au moment de l'implémentation, nous
           avons décidé que l'utilisateur devait lui-même penser que le caractère
           \textit{'\textbackslash0'} occuperait une place dans la chaîne finale et qu'il
@@ -184,7 +183,7 @@ problèmes d'implémentation. Pour cela, nous avons décidé d'appeler
 inférieure, égale ou supérieure à celle de notre buffer utilisé dans
 l'implémentation de l'appel système. Nous avons aussi testé notre fonction avec
 des appels avec des chiffres, ce qui ne pose pas de problème. En revanche,
-l'utilisation d'accents reste problématique, car MIPS utilise l'encodage ASCII
+l'utilisation d'accents reste problématique, peut être car MIPS utilise l'encodage ASCII
 et non UTF-8. Nous n'avons pas cherché à corriger cela.
 
 \subsection{Partie VI}
@@ -220,7 +219,7 @@ $N+1$). Ce test nous a permis de détecter le bug vu plus tôt (cf
 Nous avons utilisé le même système de test que vu précédemment pour cet appel système.
 Il était nécessaire de tester plusieurs valeurs limites (\textit{INT\_MAX} et \textit{INT\_MIN}) pour
 savoir si notre programme pouvait reconnaitre n'importe quel entier dans cet intervalle. Nous avons également
-du tester des chaines particulières, par exemple un nombre suivi d'une chaîne de caractères (ex \textit{'12473H'})
+du tester des chaînes particulières, par exemple un nombre suivi d'une chaîne de caractères (ex \textit{'12473H'})
 
 \subsection{Partie VIII}
 Afin d'avoir les tests les plus représentatifs possibles, nous avons essayé les formatages à notre disposition (\textit{\%d}, \textit{\%c}, ...).
