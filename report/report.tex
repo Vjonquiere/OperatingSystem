@@ -22,10 +22,18 @@
 
 \section{Bilan}
 
-Pour ce premier projet, nous avons décidé de tout faire ensemble afin de
-s'habituer à utiliser NACHOS et mieux se répartir le travail sur les prochains
-TP.
-
+Pour ce premier projet, nous avons décidé de tout faire les 4 premières parties ensemble afin de
+s'habituer à utiliser NACHOS et mieux se répartir le travail sur les Parties plus chronophages.
+Ces parties ne posant pas de problèmes, car elles étaient détaillées pas à pas dans le sujet, elles n'ont
+donc pas posé de problèmes particuliers et sont implémentés sans bug connu de notre part. Nous avons donc choisi
+d'axer ce rapport sur les parties V, VI, VII et VIII qui nous ont posé plusieurs problèmes et demandé des choix 
+d'implémentation non triviaux. 
+\linebreak
+\begin{itemize}
+    \item Dans la partie V, nous avons remarqué que notre implémentation ne prend pas en compte les caractères spéciaux dans la fonction \textit{PutString} si ceux-ci
+    sont entrés 'en dur' dans chaîne de caractères
+    \item 
+\end{itemize}
 \section{Points Délicats}
 \subsection{Partie II}
 C'est une erreur de chercher à lire un caractère avant d'être averti pour
@@ -50,8 +58,6 @@ implémenté \textit{PutChar} et \textit{GetChar}. En ce qui concerne les
 chevrons nous avons adopté la même technique que pour \textit{ConsoleTest} pour
 \textit{ConsoleDriverTest} afin d'avoir un résultat plus lisible dans la
 console.
-
-\subsection{Partie IV}
 
 \subsection{Partie V}
 Nous avons passé du temps à réfléchir à la fonction
@@ -93,6 +99,15 @@ seule fonction qui pouvait créer des problèmes sur l'écriture, et que la
 méthode \textit{GetString} pouvait, elle aussi, en être responsable (une simple
 erreur de boucle qui écrivait un caractère plus loin que le malloc).
 
+Afin d'implémenter les appels systèmes \textit{GetInt} et \textit{PutInt} nous avons dû
+faire le choix de donner une taille maximum aux nombres pour les représenter dans des strings.
+Nous avons choisi qu'un nombre pourrait faire au maximum 12 caractères (variable \textit{MAX\_INT\_SIZE} dans
+\textit{consoleDriver.h}). En effet, l'entier maximum
+étant composé de 10 chiffres, nous avons conservé deux caractères supplémentaires afin de pouvoir stocker
+le signe \textit{'-'} si celui est négatif ainsi que le caractère \textit{'\textbackslash0'} pour clôturer correctement
+la chaine. Lors de la lecture d'un entier avec \textit{GetInt}, si aucun entier n'est reconnu par
+\textit{sscanf} nous avons choisi de garder sa valeur dans le buffer (0) et donc d'affecter la valeur 0 à l'adresse
+donnée par l'utilisateur.
 \section{Limitations}
 \subsection{Partie V}
 Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue. En
@@ -113,6 +128,13 @@ choisi 8 pour que les erreurs d'implémentation soient plus faciles à détecter
 mais cela reste un nombre très petit. Peut-être que si nous sommes amenés à
 utiliser \textit{PutString} avec des chaînes de caractères très longues, il
 sera judicieux de modifier cette constante.
+
+\subsection{Partie VI}
+Lorsque nous avons implémenté l'appel système \textit{SC\_EXIT}, nous avons choisi d'uniquement afficher
+la valeur de retour dans la console. Il est donc affiché après l'exécution du programme, mais pas réellement
+utilisé par notre programme pour faire une action spécifique si la fonction \textit{main} retourne une valeur spécifique
+(un code erreur par exmple)
+
 \subsection{Partie VII}
 Dans cette partie il a fallu faire plusieurs choix d'implémentation :
 \begin{itemize}
@@ -126,18 +148,30 @@ Dans cette partie il a fallu faire plusieurs choix d'implémentation :
           pour contenir $N$ caractères. Si $N$ est plus grand que l'espace alloué à
           \textit{s} alors la fonction \textit{copyStringToMachine} pourra écrire
           en-dehors de l'espace prévu.
-    \item Lors de nos tests, nous avons remarqué un comportement étrange : si nous utilisons
+    \item A METTRE DANS BILAN == Lors de nos tests, nous avons remarqué un comportement étrange : si nous utilisons
           \textit{GetChar}, nous arrivons à avoir des chaînes de caractère avec des accents 
           et caractères spéciaux. En revanche, nous n'y arrivons pas avec \textit{PutString}.
           Nous n'avons pas trouvé de solution à ce problème, car dans notre programme de test de 
           \textit{GetString}, nous appelons \textit{PutString} afin de vérifier que le programme fonctionne.
           Nous n'avons pas compris pourquoi notre focntion ne marche que dans un des cas.
-    \item 
-AJOUTER QU'ON UTILISE ECHO ET PRINTF
-
+    \item AJOUTER QU'ON UTILISE ECHO ET PRINTF
+    \item Le choix d'avoir implémenté \textit{GetInt} de manière que l'entier 0 soit stocké
+    si aucun entier n'est reconnu peut poser problème suivant ce que l'on souhaite en faire. Cependant,
+    nous ne pouvons pas lever d'erreur, c'est donc une bonne option pour que le programme continue à s'exécuter
+    (même s'il pourrait y avoir une division par 0).
 \end{itemize}
 
 \section{Tests}
+Plusieurs des fonctions que nous avons testées le sont sur un grand nombre de valeurs.
+Nous avons donc créé des scripts bash pour exécuter avec des entrées différentes.
+C'est le cas pour les fonctions \textit{GetChar}, \textit{GetString} et \textit{GetInt}.
+Pour les exécuter il faut se placer dans le dossier \textit{code/} et exécuter l'une 
+des commandes suivantes :
+\begin{itemize}
+    \item \textit{GetChar}: ./getCharTest.sh
+    \item \textit{GetString}: ./getStringTest.sh
+    \item \textit{GetInt}: ./getIntTest.sh
+\end{itemize}
 
 \subsection{Partie V}
 Afin de tester notre appel système \textit{PutString}, nous avons rajouté un
@@ -151,8 +185,13 @@ des appels avec des chiffres, ce qui ne pose pas de problème. En revanche,
 l'utilisation d'accents reste problématique, car MIPS utilise l'encodage ASCII
 et non UTF-8. Nous n'avons pas cherché à corriger cela.
 
+\subsection{Partie VI}
+L'appel système \textit{SC\_Exit} est surement le plus simple à tester.
+Il suffit de regarder après l'exécution du programme la valeur affichée dans la console.
+Nous avons donc exécuté ce test avec plusieurs valeurs avant d'en laisser une définitive.
+
 \subsection{Partie VII}
-\subsubsection{fonction getChar}
+\subsubsection{Syscall getChar}
 La fonction \textit{getChar} dépend d'une entrée utilisateur, il était donc
 impossible de la tester avec uniquement un programme C. C'est pour cela que
 nous avons combiné notre test et la commande Linux \textit{printf}. Celle-ci
@@ -165,7 +204,7 @@ avons ensuite pensé aux caractères spéciaux, par exemple les caractères tels
 que \textit{'\textbackslash n'}, \textit{'é'} ou encore \textit{'EOF'}. Le test
 affiche donc simplement le caractère écrit à l'aide de la fonction
 \textit{putChar}
-\subsubsection{fonction getString}
+\subsubsection{Syscall getString}
 Tout comme la fonction \textit{getChar} la fonction \textit{getString} dépend
 d'une entrée utilisateur. Nous avons utilisé la même stratégie de test afin de
 vérifier l'implémentation de notre fonction. Cependant, cette fonction possède
@@ -175,31 +214,10 @@ chaîne de caractères entrée par l'utilisateur. Nous avons donc testé les
 limites évidentes (si on appelle avec des chaînes de tailles $N-1$, $N$ ou
 $N+1$). Ce test nous a permis de détecter le bug vu plus tôt (cf
 \ref{bugPartieVII}).
-\section{Brouillon}
-\subsection{Partie I}
-\begin{itemize}
-    \item on s'attend à voir quatre caractères, 'abcd' car on peut voir une boucle qui
-          ajoute 1 au caratère donné (a)
-
-\end{itemize}
-
-\subsection{Partie VI}
-\begin{itemize}
-    \item Message d'erreur `Unimplemented system call 1`, car l'appel SC\_Exit n'est pas
-          implémenté. On se sert de SC\_Halt pour arrêter la machine. On peut dupliquer
-          l'effet de SC\_Halt dans SC\_Exit afin de ne plus à avoir à l'appeler.
-    \item Changement de registre dans Start.s pour recupérer la valeur de retour
-    \item Que faire de la valeur de retour ??
-\end{itemize}
-
-\subsection{Partie VII}
-\begin{itemize}
-    \item echo ou printf
-    \item \textbackslash n fonctionne
-    \item EOF - char bizzare - corrige par pas char 0 (null)
-    \item valgrind espace util
-    \item correction ecriture hors malloc
-    \item Penser a ajouter les autres tests
-\end{itemize}
+\subsubsection{Syscall getInt}
+Nous avons utilisé le même système de test que vu précédemment pour cet appel système.
+Il était nécessaire de tester plusieurs valeurs limites (\textit{INT\_MAX} et \textit{INT\_MIN}) pour
+savoir si notre programme pouvait reconnaitre n'importe quel entier dans cet intervalle. Nous avons également
+du tester des chaines particulières, par exemple un nombre suivi d'une chaîne de caractères (ex \textit{'12473H'})
 
 \end{document}
