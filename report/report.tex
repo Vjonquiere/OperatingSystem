@@ -24,14 +24,37 @@
 
 
 \section{Points Délicats}
+\subsection{Partie II}
+C'est une erreur de chercher à lire un caractère avant d'être averti pour plusieurs raisons. Il n'y a peut-être pas de caractère tapé, et on ne peut pas lire un caractère nul puisqu'il n'existe pas.
+L'écriture du caractère précédant pourrait ne pas être finie, et dans ce cas-là, on pourrait avoir la lecture d'un caractère qui n'est pas le nôtre.
+De plus, on peut faire des combos de touches pour taper un caractère. Si on lit avant que l'on ait fini, on se retrouvera avec le mauvais caractère.
 
+    Lorsque nous avons implémenté le ConsoleTest, nous avons rencontré un problème. Nous avons eu des \textless \textgreater en trop. En réfléchissant un peu mieux,
+nous nous sommes rendu compte que cela venait du retour charriot (\textbackslash n). Nous avons donc rajouté une condition : si l'utilisateur tape un retour à la ligne, nous avons décidé de le faire sans mettre de chevrons pour avoir un affichage dans la console plus lisible.
+
+\subsection{Partie IV}
+
+
+\subsection{Partie V}
+    Nous avons passé du temps à réfléchir à la fonction \textit{copyStringFromMachine}. Nous avons surtout réfléchi à l'endroit où placer cette fonction. Cela n'avait pas de sens de le mettre dans \textit{tests} 
+car cela correspond au monde utilisateur et le mettre dans la machine ne nous plaisait pas non plus étant donné que nous ne devons pas modifier les 
+fichiers à l'intérieur. Comme c'est une fonction qui doit accéder au monde noyau,
+nous avons donc décidé de la mettre dans le dossier \textit{userprog}. Nous pensons que cette fonction peut encore nous être utile 
+dans la suite du projet, nous avons donc décidé de créer un fichier \textit{utils} pour pouvoir la retrouver facilement.
+
+    Lors de la création de l'appel système \textit{PutString}, nous nous sommes demandés quelle taille devait faire le buffer que nous utilisons pour copier la chaine de caractères.
+Nous avons choisi 8 pour pouvoir facilement se rendre compte s'il y a un problème lorsque l'on copie une chaine de caractères plus longue que le buffer. Si nous
+n'avions pas fixé de taille pour le buffer et fait en fonction de la taille de la chaine, nous aurions pu avoir plus de fragmentation de mémoire (même si nous ne nous en soucions pas encore)
+et cela aurait surtout rendu le code plus compliqué et la découverte d'erreurs et de dépassement de mémoire vraiment difficile.
 
 \section{Limitations}
-Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue En revanche, nous nous sommes rendus compte qu'il y avait toujours de la mémoire accessible après la fin de l'exécution du programme.
-Nous avons donc testé les mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le code qui nous a été fourni au début du projet. Sur les tests que nous n'avions pas implémenté, il y avait tout de même
-de la mémoire encore accessible. Nous en avons donc déduit que c'était du au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
+\subsection{Partie V}
+Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue.  En revanche, nous nous sommes rendu compte qu'il y avait toujours de la mémoire accessible après la fin de l'exécution du programme.
+Nous avons donc testé les mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le code qui nous a été fourni au début du projet. Sur les tests que nous n'avions pas implémentés, il y avait tout de même
+de la mémoire encore accessible. Nous en avons donc déduit que c'était dû au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
 
-
+Le problème le plus gênant que nous avons constaté avec PutString est le fait que nous ne savons pas gérer les accents et certains caractères spéciaux dans les chaînes de caractères.
+Cela est dû au fait que MIPS est plus ancien qu'UTF-8, nous sommes donc limités dans les chaînes que nous pouvons écrire.
 \section{Tests}
 
 \section{Brouillon}
@@ -42,14 +65,6 @@ de la mémoire encore accessible. Nous en avons donc déduit que c'était du au 
     
 \end{itemize}
 
-\subsection{Partie II}
-\begin{itemize}
-    \item C'est une erreur de lire avant d'être averti pour plusieurs raisons. Il n'y a peut être pas de charactère tapé, et on ne peut pas lire un caractère nul puisqu'il n'existe pas.
-    L'écriture du caractère précédant pourrait ne pas être finie, et dans ce cas là, on pourrait avoir la lecture d'un caractère qui n'est pas le notre.
-    De plus, on peut faire des combo de touches pour taper un caratère, si on lit avant que l'on ait finit, on se retrouvera avec le mauvais caractère.
-
-    
-\end{itemize}
 
 
 \subsection{Partie VI}
