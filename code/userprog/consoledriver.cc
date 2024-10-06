@@ -64,4 +64,24 @@ void ConsoleDriver::GetString(char *s, int n)
  }
  *s='\0';
 }
+
+void ConsoleDriver::PutInt(int n)
+{
+    char* buffer = (char*)malloc(sizeof(char)*MAX_INT_SIZE);
+    snprintf(buffer, MAX_INT_SIZE, "%d", n);
+    PutString(buffer);
+    free(buffer);
+}
+
+void ConsoleDriver::GetInt(int *n)
+{
+    char* buffer = (char*)malloc(sizeof(char)*MAX_INT_SIZE);
+    GetString(buffer, MAX_INT_SIZE);
+    if (buffer[0] != '-'){
+        buffer[MAX_INT_SIZE-2] = '\0'; // If the string is positive we need to forgot the last digit
+    }
+    sscanf(buffer, "%d", n);
+    free(buffer);
+}
+
 #endif // CHANGED
