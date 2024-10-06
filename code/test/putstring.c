@@ -6,10 +6,12 @@ PutString("a\n");
 PutString("abcd\n");
 PutString("123456\n");
 PutString("");
+PutString("test char spéciaux : € $ £ µ @ § \n");
 PutString("String longer than the buffer.\n");
 PutString("123456789\n");
 PutString("Notre appel système ne sait pas bien gérer les accents!\n");
 PutString("12345678\n");
+
 
 }
 int
