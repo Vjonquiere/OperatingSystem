@@ -67,6 +67,10 @@ CFLAGS	:=	-G 0 -DIN_USER_MODE $(INCDIR) -Wall -O2 -DCHANGED
 SOURCES	:=	$(wildcard *.c)
 PROGS	:=	$(patsubst %.c,%,$(SOURCES))
 
+ifdef CHANGED
+PROGS := $(filter-out vsprintf,$(PROGS))
+endif
+
 # We don't support native builds
 ifeq ($(GCCDIR),)
 $(warning *** WARNING *** When not running at CREMI, I need the cross compiler installed in /opt/xgcc)
@@ -79,15 +83,23 @@ start.o: start.S ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.S > strt.s
 	$(AS) $(ASFLAGS) -o start.o strt.s
 	rm strt.s
+ifdef CHANGED
+vsprintf.o: vsprintf.c
+	$(CC) $(CFLAGS) -c vsprintf.c
+endif
 
 %.o: %.c ../userprog/syscall.h
 	$(CC) $(CFLAGS) -c $< 2>&1 | sed -e 's/\(\(warning:\|attention :\).*\)/'$$'\e''[33m\1'$$'\e''[0m/'
 
 # LB: Caution! start.o should appear *before* $< for the load!
 
+ifdef CHANGED
+%.coff: %.o start.o vsprintf.o
+	$(LD) $(LDFLAGS) start.o vsprintf.o $< -o $@
+else
 %.coff: %.o start.o
 	$(LD) $(LDFLAGS) start.o $< -o $@
-
+endif
 %.s: %.coff
 	$(OBJDUMP) -d $< | sed -e 's/\<zero\>/r0/g;s/\<at\>/r1/g;s/\<v0\>/r2/g;s/\<v1\>/r3/g;s/\<a0\>/r4/g;s/\<a1\>/r5/g;s/\<a2\>/r6/g;s/\<a3\>/r7/g;s/\<t0\>/r8/g;s/\<gp\>/r28/g;s/\<sp\>/r29/g;s/\<s8\>/r30/g;s/\<ra\>/r31/g;' > $@
 
