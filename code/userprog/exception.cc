@@ -143,6 +143,7 @@ ExceptionHandler (ExceptionType which)
                     int *n = (int*)malloc(sizeof(int));
                     consoledriver->GetInt(n);
                     copyIntToMachine(n, machine->ReadRegister(4));
+                    free(n);
                     break;
                   }
                 #endif
