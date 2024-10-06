@@ -5,6 +5,7 @@
 #include "utility.h"
 #include "console.h"
 class ConsoleDriver:dontcopythis {
+    #define MAX_INT_SIZE 12
     public:
         // initialize the hardware console device
         ConsoleDriver(const char *readFile, const char *writeFile);
@@ -13,6 +14,8 @@ class ConsoleDriver:dontcopythis {
         int GetChar(); // Behaves like getchar(3S)
         void PutString(const char *s); // Behaves like fputs(3S)
         void GetString(char *s, int n); // Behaves like fgets(3S)
+        void PutInt(int n);
+        void GetInt(int *n);
     private:
         Console *console;
 };

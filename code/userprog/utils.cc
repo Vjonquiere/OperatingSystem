@@ -41,4 +41,11 @@ unsigned copyStringToMachine(char* from, int to, unsigned size){
     return i;
 }
 
+void copyIntToMachine(int* from, int to){
+    if (from == NULL){
+        DEBUG('t',"tried to copy a NULL int");
+    }
+    machine->WriteMem(to, sizeof(int), *from);
+}
+
 #endif

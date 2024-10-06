@@ -131,6 +131,20 @@ ExceptionHandler (ExceptionType which)
                     free(buffer);
                     break;
                   }
+                case SC_PutInt:
+                  {
+                    DEBUG ('s', "PutInt\n");
+                    consoledriver->PutInt(machine->ReadRegister(4));
+                    break;
+                  }
+                case SC_GetInt:
+                  {
+                    DEBUG ('s', "GetInt\n");
+                    int *n = (int*)malloc(sizeof(int));
+                    consoledriver->GetInt(n);
+                    copyIntToMachine(n, machine->ReadRegister(4));
+                    break;
+                  }
                 #endif
                 default:
                   {

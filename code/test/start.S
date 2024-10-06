@@ -174,6 +174,14 @@ PutString:
         j        $31
         .end   PutString
 
+        .globl PutInt
+        .ent   PutInt
+PutInt:
+        addiu $2,$0,SC_PutInt
+        syscall
+        j        $31
+        .end   PutInt
+
         .globl GetChar
         .ent   GetChar
 GetChar:
@@ -189,6 +197,14 @@ GetString:
         syscall
         j        $31
         .end   GetString
+
+        .globl GetInt
+        .ent   GetInt
+GetInt:
+        addiu $2,$0,SC_GetInt
+        syscall
+        j        $31
+        .end   GetInt
 
 
 /* dummy function only to keep gcc happy, it's not actually used */
