@@ -22,106 +22,177 @@
 
 \section{Bilan}
 
+Pour ce premier projet, nous avons décidé de tout faire ensemble afin de s'habituer à utiliser NACHOS et mieux se répartir
+le travail sur les prochains TP.
 
 \section{Points Délicats}
-\subsection{Partie II}
-C'est une erreur de chercher à lire un caractère avant d'être averti pour plusieurs raisons. Il n'y a peut-être pas de caractère tapé, et on ne peut pas lire un caractère nul puisqu'il n'existe pas.
-L'écriture du caractère précédant pourrait ne pas être finie, et dans ce cas-là, on pourrait avoir la lecture d'un caractère qui n'est pas le nôtre.
-De plus, on peut faire des combos de touches pour taper un caractère. Si on lit avant que l'on ait fini, on se retrouvera avec le mauvais caractère.
+    \subsection{Partie II}
+    C'est une erreur de chercher à lire un caractère avant d'être averti pour
+    plusieurs raisons. Il n'y a peut-être pas de caractère tapé, et on ne peut pas
+    lire un caractère nul puisqu'il n'existe pas. L'écriture du caractère précédant
+    pourrait ne pas être finie, et dans ce cas-là, on pourrait avoir la lecture
+    d'un caractère qui n'est pas le nôtre. De plus, on peut faire des combos de
+    touches pour taper un caractère. Si on lit avant que l'on ait fini, on se
+    retrouvera avec le mauvais caractère.
 
-    Lorsque nous avons implémenté le ConsoleTest, nous avons rencontré un problème. Nous avons eu des \textless \textgreater en trop. En réfléchissant un peu mieux,
-nous nous sommes rendu compte que cela venait du retour charriot (\textbackslash n). Nous avons donc rajouté une condition : si l'utilisateur tape un retour à la ligne, nous avons décidé de le faire sans mettre de chevrons pour avoir un affichage dans la console plus lisible.
+    Lorsque nous avons implémenté le \textit{ConsoleTest}, nous avons rencontré un problème.
+    Nous avons eu des \textless \textgreater en trop. En réfléchissant un peu
+    mieux, nous nous sommes rendu compte que cela venait du retour charriot
+    (\textbackslash n). Nous avons donc rajouté une condition : si l'utilisateur
+    tape un retour à la ligne, nous avons décidé de le faire sans mettre de
+    chevrons pour avoir un affichage dans la console plus lisible.
 
-\subsection{Partie IV}
+    \subsection{Partie III}
+    Cette partie n'a pas particulièrement posé de problème. Ayant analysé \textit{ConsoleTest} dans la partie précédante, nous
+    avons rapidement implémenté \textit{PutChar} et \textit{GetChar}. En ce qui concerne les chevrons nous avons adopté la même technique que
+    pour \textit{ConsoleTest}  pour \textit{ConsoleDriverTest} afin d'avoir un résultat plus lisible dans la console.
 
+    \subsection{Partie IV}
 
-\subsection{Partie V}
-    Nous avons passé du temps à réfléchir à la fonction \textit{copyStringFromMachine}. Nous avons surtout réfléchi à l'endroit où placer cette fonction. Cela n'avait pas de sens de le mettre dans \textit{tests} 
-car cela correspond au monde utilisateur et le mettre dans la machine ne nous plaisait pas non plus étant donné que nous ne devons pas modifier les 
-fichiers à l'intérieur. Comme c'est une fonction qui doit accéder au monde noyau,
-nous avons donc décidé de la mettre dans le dossier \textit{userprog}. Nous pensons que cette fonction peut encore nous être utile 
-dans la suite du projet, nous avons donc décidé de créer un fichier \textit{utils} pour pouvoir la retrouver facilement.
+    \subsection{Partie V}
+    Nous avons passé du temps à réfléchir à la fonction
+    \textit{copyStringFromMachine}. Nous avons surtout réfléchi à l'endroit où
+    placer cette fonction. Cela n'avait pas de sens de le mettre dans \textit{test}
+    car cela correspond au monde utilisateur et le mettre dans la machine ne nous
+    plaisait pas non plus étant donné que nous ne devons pas modifier les fichiers
+    à l'intérieur. Comme c'est une fonction qui doit accéder au monde noyau, nous
+    avons donc décidé de la mettre dans le dossier \textit{userprog}. Nous pensons
+    que cette fonction peut encore nous être utile dans la suite du projet, nous
+    avons donc décidé de créer un fichier \textit{utils} pour pouvoir la retrouver
+    facilement.
 
-    Lors de la création de l'appel système \textit{PutString}, nous nous sommes demandés quelle taille devait faire le buffer que nous utilisons pour copier la chaine de caractères.
-Nous avons choisi 8 pour pouvoir facilement se rendre compte s'il y a un problème lorsque l'on copie une chaine de caractères plus longue que le buffer. Si nous
-n'avions pas fixé de taille pour le buffer et fait en fonction de la taille de la chaine, nous aurions pu avoir plus de fragmentation de mémoire (même si nous ne nous en soucions pas encore)
-et cela aurait surtout rendu le code plus compliqué et la découverte d'erreurs et de dépassement de mémoire vraiment difficile.
-\subsection{Partie VII} \label{bugPartieVII}
-Nous n'avons pas eu de problème particulier en implémentant la fonction \textit{getChar}. Cependant, nous avons remarqué que si le caractère récupéré
-était \textit{EOF} cela pouvait créer un problème d'affichage, car il correspond à l'entier -1 qui affiche \textit{'ÿ'}. Nous avons donc décidé que si
-le caractère récupéré était un \textit{EOF}, nous ne retournerions pas -1, mais 0 (qui correspond au caractère \textit{NULL} et corrige l'affichage).
+    Lors de la création de l'appel système \textit{PutString}, nous nous sommes
+    demandés quelle taille devait faire le buffer que nous utilisons pour copier la
+    chaine de caractères. Nous avons choisi 8 pour pouvoir facilement se rendre
+    compte s'il y a un problème lorsque l'on copie une chaine de caractères plus
+    longue que le buffer. Si nous n'avions pas fixé de taille pour le buffer et
+    fait en fonction de la taille de la chaine, nous aurions pu avoir plus de
+    fragmentation de mémoire (même si nous ne nous en soucions pas encore) et cela
+    aurait surtout rendu le code plus compliqué et la découverte d'erreurs et de
+    dépassement de mémoire vraiment difficile.
 
-L'action nous ayant pris le plus de temps en réflexion dans cette partie est surement la fonction \textit{copyStringToMachine}.
-En effet, nous avons cherché un maximum de cas spécifique dans lesquels notre fonction pourrait écrire à des endroits
-indésirés. Cependant, nous avons tout de même eu des problèmes après implémentation, car \textit{Valgrind} nous indiquait des écritures
-illégales. Nous avons donc rapidement vu que \textit{copyStringToMachine} n'était pas la seule fonction qui pouvait créer des problèmes
-sur l'écriture, et que la méthode \textit{GetString} pouvait, elle aussi, en être responsable (une simple erreur de boucle qui écrivait un caractère plus loin que le malloc).
+    \subsection{Partie VII} \label{bugPartieVII}
+    Nous n'avons pas eu de problème particulier en implémentant la fonction
+    \textit{getChar}. Cependant, nous avons remarqué que si le caractère récupéré
+    était \textit{EOF} cela pouvait créer un problème d'affichage, car il
+    correspond à l'entier -1 qui affiche \textit{'ÿ'}. Nous avons donc décidé que
+    si le caractère récupéré était un \textit{EOF}, nous ne retournerions pas -1,
+    mais 0 (qui correspond au caractère \textit{NULL} et corrige l'affichage).
 
+    L'action nous ayant pris le plus de temps en réflexion dans cette partie est
+    surement la fonction \textit{copyStringToMachine}. En effet, nous avons cherché
+    un maximum de cas spécifique dans lesquels notre fonction pourrait écrire à des
+    endroits indésirés. Cependant, nous avons tout de même eu des problèmes après
+    implémentation, car \textit{Valgrind} nous indiquait des écritures illégales.
+    Nous avons donc rapidement vu que \textit{copyStringToMachine} n'était pas la
+    seule fonction qui pouvait créer des problèmes sur l'écriture, et que la
+    méthode \textit{GetString} pouvait, elle aussi, en être responsable (une simple
+    erreur de boucle qui écrivait un caractère plus loin que le malloc).
 
 \section{Limitations}
-\subsection{Partie V}
-Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue.  En revanche, nous nous sommes rendu compte qu'il y avait toujours de la mémoire accessible après la fin de l'exécution du programme.
-Nous avons donc testé les mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le code qui nous a été fourni au début du projet. Sur les tests que nous n'avions pas implémentés, il y avait tout de même
-de la mémoire encore accessible. Nous en avons donc déduit que c'était dû au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
-Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue En revanche, nous nous sommes rendus compte qu'il y avait toujours de la mémoire accessible après la fin de l'exécution du programme.
-Nous avons donc testé les mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le code qui nous a été fourni au début du projet. Sur les tests que nous n'avions pas implémenté, il y avait tout de même
-de la mémoire encore accessible. Nous en avons donc déduit que c'était dû au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
+    \subsection{Partie V}
+    Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue. En
+    revanche, nous nous sommes rendu compte qu'il y avait toujours de la mémoire
+    accessible après la fin de l'exécution du programme. Nous avons donc testé les
+    mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le
+    code qui nous a été fourni au début du projet. Sur les tests que nous n'avions
+    pas implémentés, il y avait tout de même de la mémoire encore accessible. Nous
+    en avons donc déduit que c'était dû au thread principal, que nous ne pouvons
+    donc pas détruire étant donné qu'il est la source de la machine.
 
-\subsection{Partie VII}
-Dans cette partie il a fallu faire plusieurs choix d'implémentation:
-\begin{itemize}
-    \item Lors de l'appel de \textit{getString} l'utilisateur doit fournir un pointeur où stocker sa chaine de caractères ainsi que la taille de cette chaine \linebreak (\textit{void GetString(char
-    *s, int n)}).
-    Au moment de l'implémentation nous avons décidé que l'utilisateur devait lui-même penser que le caractère \textit{'\textbackslash0'} occuperait une place dans la chaîne finale et qu'il devrait
-    donc fournir uniquement $N-1$ caractères.
-    \item Il sera également du ressort de l'utilisateur de donner un pointeur assez grand pour contenir $N$ caractères. Si $N$ est plus grand que l'espace alloué à \textit{s} alors la fonction
-    \textit{copyStringToMachine} pourra écrire en-dehors de l'espace prévu.
-\end{itemize}
+    Le problème le plus gênant que nous avons constaté avec \textit{PutString} est le fait
+    que nous ne savons pas gérer les accents et certains caractères spéciaux dans
+    les chaînes de caractères.
 
-Le problème le plus gênant que nous avons constaté avec PutString est le fait que nous ne savons pas gérer les accents et certains caractères spéciaux dans les chaînes de caractères.
-Cela est dû au fait que MIPS est plus ancien qu'UTF-8, nous sommes donc limités dans les chaînes que nous pouvons écrire.
+    Une autre limitation pourrait être la taille du buffer utilisé. Nous avons
+    choisi 8 pour que les erreurs d'implémentation soient plus faciles à détecter,
+    mais cela reste un nombre très petit. Peut-être que si nous sommes amenés à
+    utiliser \textit{PutString} avec des chaînes de caractères très longues, il sera
+    judicieux de modifier cette constante.
+    \subsection{Partie VII}
+    Dans cette partie il a fallu faire plusieurs choix d'implémentation :
+    \begin{itemize}
+        \item Lors de l'appel de \textit{getString} l'utilisateur doit fournir un pointeur où
+            stocker sa chaine de caractères ainsi que la taille de cette chaine \linebreak
+            (\textit{void GetString(char *s, int n)}). Au moment de l'implémentation, nous
+            avons décidé que l'utilisateur devait lui-même penser que le caractère
+            \textit{'\textbackslash0'} occuperait une place dans la chaîne finale et qu'il
+            devrait donc fournir uniquement $N-1$ caractères.
+        \item Il sera également du ressort de l'utilisateur de donner un pointeur assez grand
+            pour contenir $N$ caractères. Si $N$ est plus grand que l'espace alloué à
+            \textit{s} alors la fonction \textit{copyStringToMachine} pourra écrire
+            en-dehors de l'espace prévu.
+        \item Lors de nos tests, nous avons remarqué un comportement étrange : si on utilise
+            \textit{GetChar} depuis la console et que l'on tape des caractères inconnus à l'encodage
+            ASCII, nous obtenons des caractères imprévus. En revanche, si l'on utilise une commande bash suivante :
+            \textit{printf \$stringToTest | ./userprog/nachos -d s -x test/getstring}, nous pouvons voir les caractères spéciaux.
+            Nous n'avons pas réussi à corriger cela.
+
+    \end{itemize}
+
 \section{Tests}
 
-\subsection{Partie VII}
+    \subsection{Partie V}
+    Afin de tester notre appel système \textit{PutString}, nous avons rajouté un
+    programme utilisateur \textit{putstring.c }dans le dossier \textit{test}. Nous
+    avons testé notre fonction avec différents cas qui pourraient souligner des
+    problèmes d'implémentation. Pour cela, nous avons décidé d'appeler
+    \textit{PutString} sur des chaînes de différentes tailles : avec une taille
+    inférieure, égale ou supérieure à celle de notre buffer utilisé dans
+    l'implémentation de l'appel système. Nous avons aussi testé notre fonction avec
+    des appels avec des chiffres, ce qui ne pose pas de problème. En revanche,
+    l'utilisation d'accents reste problématique, car MIPS utilise l'encodage ASCII
+    et non UTF-8. Nous n'avons pas cherché à corriger cela.
+
+    \subsection{Partie VII}
     \subsubsection{fonction getChar}
-    La fonction \textit{getChar} dépend d'une entrée utilisateur, il était donc impossible de la tester avec uniquement
-    un programme C. C'est pour cela que nous avons combiné notre test et la commande Linux \textit{printf}. Celle-ci
-    nous permet de passer n'importe quel caractère dans notre programme. Afin d'avoir un échantillon de test convaincant,
-    nous avons cherché quels cas auraient pu mettre à mal notre implémentation. Nous avons donc pensé tout d'abord aux entrées
-    de plus d'un caractère (puisque \textit{getChar} doit lire uniquement un caractère), et notre implémentation semblait gérer ces cas.
-    Nous avons ensuite pensé aux caractères spéciaux, par exemple les caractères tels que \textit{'\textbackslash n'}, \textit{'é'} ou encore \textit{'EOF'}.
-    Le test affiche donc simplement le caractère écrit à l'aide de la fonction \textit{putChar}
-    \subsubsection{fonction getString} 
-    Tout comme la fonction \textit{getChar} la fonction \textit{getString} dépend d'une entrée utilisateur. Nous avons utilisé la même stratégie
-    de test afin de vérifier l'implémentation de notre fonction. Cependant, cette fonction possède plus de cas particulier pouvant ne pas être gérés par notre implémentation.
-    En effet, nos tests ont beaucoup portés sur la gestion de mémoire/copie de la chaîne de caractères entrée par l'utilisateur. Nous avons donc testé les limites évidentes
-    (si on appelle avec des chaînes de tailles $N-1$, $N$ ou $N+1$). Ce test nous a permis de détecter le bug vu plus tôt (cf \ref{bugPartieVII}).
+    La fonction \textit{getChar} dépend d'une entrée utilisateur, il était donc
+    impossible de la tester avec uniquement un programme C. C'est pour cela que
+    nous avons combiné notre test et la commande Linux \textit{printf}. Celle-ci
+    nous permet de passer n'importe quel caractère dans notre programme. Afin
+    d'avoir un échantillon de test convaincant, nous avons cherché quels cas
+    auraient pu mettre à mal notre implémentation. Nous avons donc pensé tout
+    d'abord aux entrées de plus d'un caractère (puisque \textit{getChar} doit lire
+    uniquement un caractère), et notre implémentation semblait gérer ces cas. Nous
+    avons ensuite pensé aux caractères spéciaux, par exemple les caractères tels
+    que \textit{'\textbackslash n'}, \textit{'é'} ou encore \textit{'EOF'}. Le test
+    affiche donc simplement le caractère écrit à l'aide de la fonction
+    \textit{putChar}
+    \subsubsection{fonction getString}
+    Tout comme la fonction \textit{getChar} la fonction \textit{getString} dépend
+    d'une entrée utilisateur. Nous avons utilisé la même stratégie de test afin de
+    vérifier l'implémentation de notre fonction. Cependant, cette fonction possède
+    plus de cas particuliers pouvant ne pas être gérés par notre implémentation. En
+    effet, nos tests ont beaucoup porté sur la gestion de mémoire/copie de la
+    chaîne de caractères entrée par l'utilisateur. Nous avons donc testé les
+    limites évidentes (si on appelle avec des chaînes de tailles $N-1$, $N$ ou
+    $N+1$). Ce test nous a permis de détecter le bug vu plus tôt (cf
+    \ref{bugPartieVII}).
 \section{Brouillon}
 \subsection{Partie I}
 \begin{itemize}
-    \item on s'attend à voir quatre caractères, 'abcd' car on peut voir une boucle qui ajoute 1 au caratère donné (a)
+	\item on s'attend à voir quatre caractères, 'abcd' car on peut voir une boucle qui
+	      ajoute 1 au caratère donné (a)
 
-    
 \end{itemize}
-
-
 
 \subsection{Partie VI}
 \begin{itemize}
-    \item Message d'erreur `Unimplemented system call 1`, car l'appel SC\_Exit n'est pas implémenté. On se sert de SC\_Halt pour arrêter la machine.
-    On peut dupliquer l'effet de SC\_Halt dans SC\_Exit afin de ne plus à avoir à l'appeler.
-    \item Changement de registre dans Start.s pour recupérer la valeur de retour
-    \item Que faire de la valeur de retour ??
+	\item Message d'erreur `Unimplemented system call 1`, car l'appel SC\_Exit n'est pas
+	      implémenté. On se sert de SC\_Halt pour arrêter la machine. On peut dupliquer
+	      l'effet de SC\_Halt dans SC\_Exit afin de ne plus à avoir à l'appeler.
+	\item Changement de registre dans Start.s pour recupérer la valeur de retour
+	\item Que faire de la valeur de retour ??
 \end{itemize}
 
 \subsection{Partie VII}
 \begin{itemize}
-    \item echo ou printf
-    \item \textbackslash n fonctionne
-    \item EOF - char bizzare - corrige par pas char 0 (null)
-    \item valgrind espace util 
-    \item correction ecriture hors malloc
-    \item Penser a ajouter les autres tests
+	\item echo ou printf
+	\item \textbackslash n fonctionne
+	\item EOF - char bizzare - corrige par pas char 0 (null)
+	\item valgrind espace util
+	\item correction ecriture hors malloc
+	\item Penser a ajouter les autres tests
 \end{itemize}
 
 \end{document}
