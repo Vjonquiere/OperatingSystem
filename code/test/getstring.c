@@ -3,8 +3,8 @@
 int
 main()
 {
-char s[2];
-GetString(s, 5);
+char s[20];
+GetString(s, 20);
 PutString(s);
 return 1;
 }

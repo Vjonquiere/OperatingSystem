@@ -10,6 +10,7 @@ PutString("String longer than the buffer.");
 PutString("123456789");
 PutString("Notre appel système ne sait pas bien gérer les accents!");
 PutString("12345678");
+PutString("test char spéciaux : € $ £ µ @ § ");
 
 }
 int
