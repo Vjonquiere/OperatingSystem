@@ -25,15 +25,51 @@
 
 \section{Points Délicats}
 
+\subsection{Partie VII} \label{bugPartieVII}
+Nous n'avons pas eu de problème particulier en implémentant la fonction \textit{getChar}. Cependant, nous avons remarqué que si le caractère récupéré
+était \textit{EOF} cela pouvait créer un problème d'affichage, car il correspond à l'entier -1 qui affiche \textit{'ÿ'}. Nous avons donc décidé que si
+le caractère récupéré était un \textit{EOF}, nous ne retournerions pas -1, mais 0 (qui correspond au caractère \textit{NULL} et corrige l'affichage).
+
+L'action nous ayant pris le plus de temps en réflexion dans cette partie est surement la fonction \textit{copyStringToMachine}.
+En effet, nous avons cherché un maximum de cas spécifique dans lesquels notre fonction pourrait écrire à des endroits
+indésirés. Cependant, nous avons tout de même eu des problèmes après implémentation, car \textit{Valgrind} nous indiquait des écritures
+illégales. Nous avons donc rapidement vu que \textit{copyStringToMachine} n'était pas la seule fonction qui pouvait créer des problèmes
+sur l'écriture, et que la méthode \textit{GetString} pouvait, elle aussi, en être responsable (une simple erreur de boucle qui écrivait un caractère plus loin que le malloc).
+
 
 \section{Limitations}
 Au niveau des fuites mémoires, nous n'avons pas trouvé de mémoire perdue En revanche, nous nous sommes rendus compte qu'il y avait toujours de la mémoire accessible après la fin de l'exécution du programme.
 Nous avons donc testé les mêmes commandes de détection de fuite mémoire sur notre code actuel et sur le code qui nous a été fourni au début du projet. Sur les tests que nous n'avions pas implémenté, il y avait tout de même
-de la mémoire encore accessible. Nous en avons donc déduit que c'était du au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
+de la mémoire encore accessible. Nous en avons donc déduit que c'était dû au thread principal, que nous ne pouvons donc pas détruire étant donné qu'il est la source de la machine.
+
+\subsection{Partie VII}
+Dans cette partie il a fallu faire plusieurs choix d'implémentation:
+\begin{itemize}
+    \item Lors de l'appel de \textit{getString} l'utilisateur doit fournir un pointeur où stocker sa chaine de caractères ainsi que la taille de cette chaine \linebreak (\textit{void GetString(char
+    *s, int n)}).
+    Au moment de l'implémentation nous avons décidé que l'utilisateur devait lui-même penser que le caractère \textit{'\textbackslash0'} occuperait une place dans la chaîne finale et qu'il devrait
+    donc fournir uniquement $N-1$ caractères.
+    \item Il sera également du ressort de l'utilisateur de donner un pointeur assez grand pour contenir $N$ caractères. Si $N$ est plus grand que l'espace alloué à \textit{s} alors la fonction
+    \textit{copyStringToMachine} pourra écrire en-dehors de l'espace prévu.
+\end{itemize}
 
 
 \section{Tests}
 
+\subsection{Partie VII}
+    \subsubsection{fonction getChar}
+    La fonction \textit{getChar} dépend d'une entrée utilisateur, il était donc impossible de la tester avec uniquement
+    un programme C. C'est pour cela que nous avons combiné notre test et la commande Linux \textit{printf}. Celle-ci
+    nous permet de passer n'importe quel caractère dans notre programme. Afin d'avoir un échantillon de test convaincant,
+    nous avons cherché quels cas auraient pu mettre à mal notre implémentation. Nous avons donc pensé tout d'abord aux entrées
+    de plus d'un caractère (puisque \textit{getChar} doit lire uniquement un caractère), et notre implémentation semblait gérer ces cas.
+    Nous avons ensuite pensé aux caractères spéciaux, par exemple les caractères tels que \textit{'\textbackslash n'}, \textit{'é'} ou encore \textit{'EOF'}.
+    Le test affiche donc simplement le caractère écrit à l'aide de la fonction \textit{putChar}
+    \subsubsection{fonction getString} 
+    Tout comme la fonction \textit{getChar} la fonction \textit{getString} dépend d'une entrée utilisateur. Nous avons utilisé la même stratégie
+    de test afin de vérifier l'implémentation de notre fonction. Cependant, cette fonction possède plus de cas particulier pouvant ne pas être gérés par notre implémentation.
+    En effet, nos tests ont beaucoup portés sur la gestion de mémoire/copie de la chaîne de caractères entrée par l'utilisateur. Nous avons donc testé les limites évidentes
+    (si on appelle avec des chaînes de tailles $N-1$, $N$ ou $N+1$). Ce test nous a permis de détecter le bug vu plus tôt (cf \ref{bugPartieVII}).
 \section{Brouillon}
 \subsection{Partie I}
 \begin{itemize}
@@ -67,6 +103,7 @@ de la mémoire encore accessible. Nous en avons donc déduit que c'était du au 
     \item EOF - char bizzare - corrige par pas char 0 (null)
     \item valgrind espace util 
     \item correction ecriture hors malloc
+    \item Penser a ajouter les autres tests
 \end{itemize}
 
 \end{document}
