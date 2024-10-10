@@ -27,6 +27,7 @@
 
 #ifdef CHANGED
 #include "utils.h"
+#include "userthread.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -146,6 +147,16 @@ ExceptionHandler (ExceptionType which)
                     free(n);
                     break;
                   }
+                case SC_ThreadCreate:
+                {
+                  DEBUG ('s', "ThreadCreate\n");
+                  break;
+                }
+                case SC_ThreadExit:
+                {
+                  DEBUG ('s', "ThreadExit\n");
+                  break;
+                }
                 #endif
                 default:
                   {
