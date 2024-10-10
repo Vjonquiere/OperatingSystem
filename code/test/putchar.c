@@ -1,3 +1,4 @@
+#ifdef CHANGED
 #include "syscall.h"
 void print(char c, int n)
 {
@@ -13,3 +14,4 @@ main()
 print('a',4);
 return 1;
 }
+#endif

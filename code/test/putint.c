@@ -1,3 +1,4 @@
+#ifdef CHANGED
 #include "syscall.h"
 #include "limits.h"
 int
@@ -10,7 +11,7 @@ PutInt(INT_MAX);
 PutInt(INT_MIN);
 return 1;
 }
-
+#endif
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
 then execute the following command:

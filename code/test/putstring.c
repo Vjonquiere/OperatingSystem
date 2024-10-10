@@ -1,3 +1,4 @@
+#ifdef CHANGED
 #include "syscall.h"
 
 void testPutString()
@@ -20,7 +21,7 @@ main()
 testPutString();
 Halt();
 }
-
+#endif
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
 then execute the following command:

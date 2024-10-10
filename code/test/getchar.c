@@ -1,3 +1,4 @@
+#ifdef CHANGED
 #include "syscall.h"
 
 int
@@ -6,7 +7,7 @@ main()
 PutChar(GetChar());
 return 1;
 }
-
+#endif
 
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.

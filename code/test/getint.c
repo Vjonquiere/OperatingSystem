@@ -1,3 +1,4 @@
+#ifdef CHANGED
 #include "syscall.h"
 
 int
@@ -8,6 +9,7 @@ GetInt(&a);
 PutInt(a);
 return 1;
 }
+#endif
 
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
