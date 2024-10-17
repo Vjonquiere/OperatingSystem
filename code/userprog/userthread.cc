@@ -13,15 +13,16 @@ static void StartUserThread(void *schmurtz){
     machine->WriteRegister(4,s->arg);
     DEBUG('s', "Initializing arg in reg 4\n");
     machine->WriteRegister(PCReg,s->f);
-    DEBUG('s', "Initializing f in PCReg\n");
+    DEBUG('s', "Initializing f in PCReg : 0x%x \n", machine->ReadRegister(PCReg));
     machine->WriteRegister (NextPCReg, machine->ReadRegister(PCReg) + 4);
     DEBUG('s', "Initializing NextPCReg\n");
 
     machine->WriteRegister (StackReg,currentThread->space->AllocateUserStack());
     DEBUG ('s', "Initializing stack register to 0x%x\n",
-           (currentThread->space->NumPages()) * PageSize - 256);
+           machine->ReadRegister(StackReg));
     free(schmurtz);
 
+    machine->DumpMem("threads.svg");
     machine->Run();
 
 }
@@ -34,8 +35,15 @@ int do_ThreadCreate(int f, int arg){
     schmurtz->f = f;
     schmurtz->arg = arg;
   
+    DEBUG ('s', "Reading main stack register to 0x%x\n",
+           machine->ReadRegister(StackReg));
     newThread->Start(StartUserThread, schmurtz);
     return -1;
+}
+
+void do_ThreadExit(){
+    //TODO: réfléchir si il faut faire quelque chose par rapport a space
+    currentThread->Finish();
 }
 
 #endif
