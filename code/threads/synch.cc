@@ -109,22 +109,42 @@ Semaphore::V ()
 // the test case in the network assignment won't work!
 Lock::Lock (const char *debugName)
 {
-    (void) debugName;
-    ASSERT_MSG(FALSE, "TODO\n");
+    //(void) debugName;
+    #ifdef CHANGED
+    name = debugName;
+    mutex = new Semaphore("test", 1);
+    owner = NULL;
+    #endif
 }
 
 Lock::~Lock ()
 {
+    #ifdef CHANGED
+    delete mutex;
+    owner = NULL;
+    #endif
 }
 void
 Lock::Acquire ()
 {
-    ASSERT_MSG(FALSE, "TODO\n");
+    #ifdef CHANGED
+    DEBUG('s', "Thread: %s is waiting for mutex (%s)", currentThread->getName(), name);
+    mutex->P();
+    DEBUG('s', "Thread: %s acquired mutex (%s)", currentThread->getName(), name);
+    owner = currentThread;
+    #endif
 }
 void
 Lock::Release ()
 {
-    ASSERT_MSG(FALSE, "TODO\n");
+    #ifdef CHANGED
+    if (strcmp(currentThread->getName(), owner->getName()) == 0){
+        owner = NULL;
+        mutex->V();
+    } else {
+        DEBUG('s', "Thread: %s tried to release a mutex it didn't lock", currentThread->getName());
+    }
+    #endif
 }
 
 Condition::Condition (const char *debugName)
