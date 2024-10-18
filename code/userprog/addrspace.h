@@ -41,6 +41,10 @@ class AddrSpace:public dontcopythis
                                 // Dump program layout as SVG
     unsigned NumPages(void) { return numPages; }
 
+    #ifdef CHANGED
+    int AllocateUserStack();
+    #endif
+
   private:
     NoffHeader noffH;           // Program layout
 
