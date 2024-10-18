@@ -112,7 +112,7 @@ Lock::Lock (const char *debugName)
     //(void) debugName;
     #ifdef CHANGED
     name = debugName;
-    mutex = new Semaphore("test", 1);
+    mutex = new Semaphore(debugName, 1);
     owner = NULL;
     #endif
 }
@@ -128,22 +128,27 @@ void
 Lock::Acquire ()
 {
     #ifdef CHANGED
-    DEBUG('s', "Thread: %s is waiting for mutex (%s)", currentThread->getName(), name);
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    DEBUG('s', "Thread: %s is waiting for mutex (%s)\n", currentThread->getName(), name);
     mutex->P();
-    DEBUG('s', "Thread: %s acquired mutex (%s)", currentThread->getName(), name);
+    DEBUG('s', "Thread: %s acquired mutex (%s)\n", currentThread->getName(), name);
     owner = currentThread;
+    (void) interrupt->SetLevel (oldLevel);
     #endif
 }
 void
 Lock::Release ()
 {
     #ifdef CHANGED
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
     if (strcmp(currentThread->getName(), owner->getName()) == 0){
         owner = NULL;
         mutex->V();
+        DEBUG('s', "Thread: %s released mutex (%s)\n", currentThread->getName(), name);
     } else {
-        DEBUG('s', "Thread: %s tried to release a mutex it didn't lock", currentThread->getName());
+        DEBUG('s', "Thread: %s tried to release a mutex it didn't lock\n", currentThread->getName());
     }
+    (void) interrupt->SetLevel (oldLevel);
     #endif
 }
 

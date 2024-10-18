@@ -6,6 +6,8 @@
 #include "utils.h"
 static Semaphore *readAvail;
 static Semaphore *writeDone;
+static Lock *writeLock;
+static Lock *readLock;
 static void ReadAvailHandler(void *arg) { (void) arg; readAvail->V(); }
 static void WriteDoneHandler(void *arg) { (void) arg; writeDone->V(); }
 
@@ -14,6 +16,8 @@ ConsoleDriver::ConsoleDriver(const char *in, const char *out)
     readAvail = new Semaphore("read avail", 0);
     writeDone = new Semaphore("write done", 0);
     console = new Console(in, out, ReadAvailHandler, WriteDoneHandler, NULL);
+    writeLock = new Lock("write");
+    readLock = new Lock("read");
 }
 
 ConsoleDriver::~ConsoleDriver()
@@ -25,8 +29,10 @@ ConsoleDriver::~ConsoleDriver()
 
 void ConsoleDriver::PutChar(int ch)
 {
+    writeLock->Acquire();
     console->TX (ch);      // echo it!
     writeDone->P ();       // wait for write to finish
+    writeLock->Release();
 }
 int ConsoleDriver::GetChar()
 {
