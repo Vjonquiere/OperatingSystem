@@ -21,6 +21,11 @@
 
 #define UserStacksAreaSize		1024	// increase this as necessary!
 
+#ifdef CHANGED
+class Lock;
+#endif
+
+
 class AddrSpace:public dontcopythis
 {
   public:
@@ -43,9 +48,14 @@ class AddrSpace:public dontcopythis
 
     #ifdef CHANGED
     int AllocateUserStack();
+    int ResetUserStack();
     #endif
 
   private:
+    #ifdef CHANGED
+    Lock *mutex;
+    unsigned int remaining;
+    #endif
     NoffHeader noffH;           // Program layout
 
     TranslationEntry * pageTable; // Page table

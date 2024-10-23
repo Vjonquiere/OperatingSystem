@@ -21,7 +21,6 @@ static void StartUserThread(void *schmurtz){
     DEBUG ('s', "Initializing stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
     free(schmurtz);
-
     machine->DumpMem("threads.svg");
     machine->Run();
 
@@ -42,7 +41,10 @@ int do_ThreadCreate(int f, int arg){
 }
 
 void do_ThreadExit(){
-    //TODO: réfléchir si il faut faire quelque chose par rapport a space
+    int remaining = currentThread->space->ResetUserStack();
+    if (remaining <= 0){
+        interrupt->Powerdown();
+    }
     currentThread->Finish();
 }
 

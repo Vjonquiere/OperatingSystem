@@ -21,6 +21,7 @@
 #include "noff.h"
 #include "syscall.h"
 #include "new"
+#include "synch.h"
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -69,6 +70,9 @@ List AddrSpaceList;
 AddrSpace::AddrSpace (OpenFile * executable)
 {
     unsigned int i, size;
+
+    mutex = new Lock("remainingThreads");
+    remaining = 0;
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
@@ -293,6 +297,17 @@ AddrSpace::RestoreState ()
 
 #ifdef CHANGED
 int AddrSpace::AllocateUserStack(){
-    return (currentThread->space->NumPages()) * PageSize - 256;
+    mutex->Acquire();
+    remaining ++;
+    mutex->Release();
+    return (currentThread->space->NumPages()) * PageSize - 256; // mettre a jour la taille du stack pointer avec les autres threads
+}
+
+int AddrSpace::ResetUserStack(){
+    mutex->Acquire();
+    int r = remaining --;
+    mutex->Release();
+    DEBUG('s', "Thread going down: %d thread(s) remaining on AddrSpace\n", r);
+    return r;
 }
 #endif
