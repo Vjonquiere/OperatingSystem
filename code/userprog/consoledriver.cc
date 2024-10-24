@@ -25,6 +25,8 @@ ConsoleDriver::~ConsoleDriver()
     delete console;
     delete writeDone;
     delete readAvail;
+    delete writeLock;
+    delete readLock;
 }
 
 void ConsoleDriver::PutChar(int ch)

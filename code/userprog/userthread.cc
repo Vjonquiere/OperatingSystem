@@ -3,6 +3,7 @@
 typedef struct schmurtz_t {
     int f;
     int arg;
+    int stackAddress;
 }Schmurtz;
 
 
@@ -17,23 +18,28 @@ static void StartUserThread(void *schmurtz){
     machine->WriteRegister (NextPCReg, machine->ReadRegister(PCReg) + 4);
     DEBUG('s', "Initializing NextPCReg\n");
 
-    machine->WriteRegister (StackReg,currentThread->space->AllocateUserStack());
+    machine->WriteRegister (StackReg,s->stackAddress);
     DEBUG ('s', "Initializing stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
-    free(schmurtz);
+    free(s);
     machine->DumpMem("threads.svg");
     machine->Run();
 
 }
 
 int do_ThreadCreate(int f, int arg){
+    int stackAddr =currentThread->space->AllocateUserStack();
+    if(stackAddr == -1){
+        return -1;
+    }
     Thread *newThread = new Thread("newThread");
     AddrSpace *oldSpace = currentThread->space;
     newThread->space = oldSpace;
     Schmurtz *schmurtz= (Schmurtz*) malloc(sizeof(Schmurtz));
     schmurtz->f = f;
     schmurtz->arg = arg;
-  
+    schmurtz->stackAddress = stackAddr;
+
     DEBUG ('s', "Reading main stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
     newThread->Start(StartUserThread, schmurtz);
@@ -41,8 +47,9 @@ int do_ThreadCreate(int f, int arg){
 }
 
 void do_ThreadExit(){
-    int remaining = currentThread->space->ResetUserStack();
+    int remaining = currentThread->space->ThreadLeaving();
     if (remaining <= 0){
+        delete currentThread->space;
         interrupt->Powerdown();
     }
     currentThread->Finish();

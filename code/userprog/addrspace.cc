@@ -70,9 +70,12 @@ List AddrSpaceList;
 AddrSpace::AddrSpace (OpenFile * executable)
 {
     unsigned int i, size;
-
+    #ifdef CHANGED
     mutex = new Lock("remainingThreads");
     remaining = 0;
+    stackBitmap = new BitMap(UserStacksAreaSize/256);
+    stackBitmap->Mark(0);
+    #endif
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
@@ -140,6 +143,11 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
 AddrSpace::~AddrSpace ()
 {
+  #ifdef CHANGED
+  delete mutex;
+  delete stackBitmap;
+  DEBUG('s', "mutex deleted");
+  #endif
   delete [] pageTable;
   pageTable = NULL;
 
@@ -298,14 +306,28 @@ AddrSpace::RestoreState ()
 #ifdef CHANGED
 int AddrSpace::AllocateUserStack(){
     mutex->Acquire();
-    remaining ++;
+    /* we put the marking of the new thread stack in the bitmap here so we are sure 
+    that we have enough space to create it
+    it needs to be inside the mutex so two threads are not creted at the same address
+    */
+   remaining ++;
+    int index = stackBitmap->Find();
+    if(index == -1){
+        mutex->Release();
+        return -1;
+    }
+    else{
+        stackBitmap->Mark(index);
+    }
     mutex->Release();
-    return (currentThread->space->NumPages()) * PageSize - 256; // mettre a jour la taille du stack pointer avec les autres threads
+    return (currentThread->space->NumPages()) * PageSize - 256*index; // mettre a jour la taille du stack pointer avec les autres threads
 }
 
-int AddrSpace::ResetUserStack(){
+int AddrSpace::ThreadLeaving(){
     mutex->Acquire();
     int r = remaining --;
+    DEBUG('s', "Clear thread%d",machine->ReadRegister(StackReg));
+    stackBitmap->Clear((machine->ReadRegister(StackReg)-UserStacksAreaSize)%256);
     mutex->Release();
     DEBUG('s', "Thread going down: %d thread(s) remaining on AddrSpace\n", r);
     return r;
