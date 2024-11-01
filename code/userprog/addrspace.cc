@@ -21,6 +21,7 @@
 #include "noff.h"
 #include "syscall.h"
 #include "new"
+#include "synch.h"
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -69,6 +70,12 @@ List AddrSpaceList;
 AddrSpace::AddrSpace (OpenFile * executable)
 {
     unsigned int i, size;
+    #ifdef CHANGED
+    mutex = new Lock("remainingThreads");
+    remaining = 0;
+    stackBitmap = new BitMap(UserStacksAreaSize/256);
+    stackBitmap->Mark(0); // Main thread use the index 0
+    #endif
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
@@ -136,6 +143,11 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
 AddrSpace::~AddrSpace ()
 {
+  #ifdef CHANGED
+  delete mutex;
+  delete stackBitmap;
+  DEBUG('s', "mutex deleted");
+  #endif
   delete [] pageTable;
   pageTable = NULL;
 
@@ -293,6 +305,31 @@ AddrSpace::RestoreState ()
 
 #ifdef CHANGED
 int AddrSpace::AllocateUserStack(){
-    return (currentThread->space->NumPages()) * PageSize - 256;
+    mutex->Acquire();
+    /* we put the marking of the new thread stack in the bitmap here so we are sure 
+    that we have enough space to create it
+    it needs to be inside the mutex so two threads are not creted at the same address
+    */
+    int index = stackBitmap->Find();
+    if(index == -1){
+        mutex->Release();
+        return -1;
+    }
+    else{
+        remaining ++;
+        stackBitmap->Mark(index);
+    }
+    mutex->Release();
+    return index; // mettre a jour la taille du stack pointer avec les autres threads
+}
+
+int AddrSpace::ThreadLeaving(){
+    mutex->Acquire();
+    int r = remaining --;
+    DEBUG('s', "Clear thread%d\n",currentThread->stackIndex);
+    stackBitmap->Clear(currentThread->stackIndex);
+    mutex->Release();
+    DEBUG('s', "Thread going down: %d thread(s) remaining on AddrSpace\n", r);
+    return r;
 }
 #endif

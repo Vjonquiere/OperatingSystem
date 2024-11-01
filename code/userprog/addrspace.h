@@ -18,8 +18,17 @@
 #include "translate.h"
 #include "noff.h"
 #include "list.h"
+#ifdef CHANGED
+#include "bitmap.h"
+#endif
+
 
 #define UserStacksAreaSize		1024	// increase this as necessary!
+
+#ifdef CHANGED
+class Lock;
+#endif
+
 
 class AddrSpace:public dontcopythis
 {
@@ -43,9 +52,15 @@ class AddrSpace:public dontcopythis
 
     #ifdef CHANGED
     int AllocateUserStack();
+    int ThreadLeaving();
     #endif
 
   private:
+    #ifdef CHANGED
+    Lock *mutex;
+    unsigned int remaining;
+    BitMap *stackBitmap;
+    #endif
     NoffHeader noffH;           // Program layout
 
     TranslationEntry * pageTable; // Page table

@@ -84,6 +84,9 @@ class Thread:public dontcopythis
     unsigned long machineState[MachineStateSize]; // all kernel registers except for stackTop
 
   public:
+        #ifdef CHANGED
+            int stackIndex;
+        #endif
       Thread (const char *debugName);   // initialize a Thread
       void SetMain (void);              // initialize Thread as main thread
      ~Thread ();                        // deallocate a Thread

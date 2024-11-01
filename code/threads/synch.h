@@ -90,7 +90,8 @@ class Lock:public dontcopythis
     // plus some other stuff you'll need to define
     #ifdef CHANGED
     Thread* owner;
-    Semaphore* mutex;
+    bool locked;
+    List *queue; // list of threads waiting for the lock
     #endif
 };
 

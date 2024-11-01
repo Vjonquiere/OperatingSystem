@@ -112,16 +112,17 @@ Lock::Lock (const char *debugName)
     //(void) debugName;
     #ifdef CHANGED
     name = debugName;
-    mutex = new Semaphore(debugName, 1);
+    locked = false;
     owner = NULL;
+    queue = new List;
     #endif
 }
 
 Lock::~Lock ()
 {
     #ifdef CHANGED
-    delete mutex;
     owner = NULL;
+    delete queue;
     #endif
 }
 void
@@ -130,9 +131,14 @@ Lock::Acquire ()
     #ifdef CHANGED
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
     DEBUG('s', "Thread: %s is waiting for mutex (%s)\n", currentThread->getName(), name);
-    mutex->P();
-    DEBUG('s', "Thread: %s acquired mutex (%s)\n", currentThread->getName(), name);
+    while (locked)
+      {				// lock not available
+          queue->Append ((void *) currentThread);        // so go to sleep
+          currentThread->Sleep ();
+      }
+    locked=true;
     owner = currentThread;
+     DEBUG('s', "Thread: %s acquired mutex (%s)\n", currentThread->getName(), name);
     (void) interrupt->SetLevel (oldLevel);
     #endif
 }
@@ -140,10 +146,14 @@ void
 Lock::Release ()
 {
     #ifdef CHANGED
-    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    IntStatus oldLevel = interrupt->SetLevel (IntOff); // stop the interrupst so the operation is "atomic"
     if (strcmp(currentThread->getName(), owner->getName()) == 0){
         owner = NULL;
-        mutex->V();
+        locked = false;
+        Thread *thread = (Thread *) queue->Remove (); // wake up a thread waiting for the mutex
+        if (thread != NULL){
+            scheduler->ReadyToRun (thread);
+        }  
         DEBUG('s', "Thread: %s released mutex (%s)\n", currentThread->getName(), name);
     } else {
         DEBUG('s', "Thread: %s tried to release a mutex it didn't lock\n", currentThread->getName());

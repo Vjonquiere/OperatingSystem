@@ -57,6 +57,10 @@ Thread::Thread (const char *threadName)
     stack_size = 0;
     main_stack = 0;
 
+    #ifdef CHANGED
+    stackIndex = -1;
+    #endif
+
     status = JUST_CREATED;
 #ifdef USER_PROGRAM
     space = NULL;
@@ -99,6 +103,9 @@ Thread::SetMain (void)
 #endif
 
     main_stack = 1;
+    #ifdef CHANGED
+    stackIndex=0;
+    #endif
 
     setStatus (RUNNING);
 }
