@@ -74,7 +74,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
     mutex = new Lock("remainingThreads");
     remaining = 0;
     stackBitmap = new BitMap(UserStacksAreaSize/256);
-    stackBitmap->Mark(0);
+    stackBitmap->Mark(0); // Main thread use the index 0
     #endif
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
@@ -310,24 +310,24 @@ int AddrSpace::AllocateUserStack(){
     that we have enough space to create it
     it needs to be inside the mutex so two threads are not creted at the same address
     */
-   remaining ++;
     int index = stackBitmap->Find();
     if(index == -1){
         mutex->Release();
         return -1;
     }
     else{
+        remaining ++;
         stackBitmap->Mark(index);
     }
     mutex->Release();
-    return (currentThread->space->NumPages()) * PageSize - 256*index; // mettre a jour la taille du stack pointer avec les autres threads
+    return index; // mettre a jour la taille du stack pointer avec les autres threads
 }
 
 int AddrSpace::ThreadLeaving(){
     mutex->Acquire();
     int r = remaining --;
-    DEBUG('s', "Clear thread%d",machine->ReadRegister(StackReg));
-    stackBitmap->Clear((machine->ReadRegister(StackReg)-UserStacksAreaSize)%256);
+    DEBUG('s', "Clear thread%d\n",currentThread->stackIndex);
+    stackBitmap->Clear(currentThread->stackIndex);
     mutex->Release();
     DEBUG('s', "Thread going down: %d thread(s) remaining on AddrSpace\n", r);
     return r;
