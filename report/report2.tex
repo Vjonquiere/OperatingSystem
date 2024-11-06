@@ -1,0 +1,39 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+\author{
+    Valentin Jonquière,
+    Mathilde Chollon
+}
+
+\title{Rapport TD2 OS}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+\section{Bilan}
+
+\section{Points Délicats}
+Nous avons passé du temps sur la création de mutex. En effet, nous avons commencé par les créer à l'aide
+des sémaphores initialisés à un afin de ne pas copier/coller la quasi totalité de leurs fonctions.
+
+\section{Limitations}
+Beaucoup de memory leak avec les threads : les fonctions de Cleanup ne suppriment pas la stack.
+En effet, il y a bien une fonction \textit{StackAllocate} mais pas de \textit{StackDeallocate}.
+Nous nous retrouvons donc avec 73K octets non supprimés à la fin de l'exécution lorsque nous utilisons des threads.
+
+\section{Tests}
+
+\section{Brouillon}
+
+
+\end{document}
