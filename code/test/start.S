@@ -222,7 +222,37 @@ ThreadExit:
         j        $31
         .end   ThreadExit
 
+        .globl SemaphoreCreate
+        .ent   SemaphoreCreate
+SemaphoreCreate:
+        addiu $2,$0,SC_SemCreate
+        syscall
+        j        $31
+        .end   SemaphoreCreate
 
+        .globl SemaphoreDelete
+        .ent   SemaphoreDelete
+SemaphoreDelete:
+        addiu $2,$0,SC_SemDelete
+        syscall
+        j        $31
+        .end   SemaphoreDelete
+
+        .globl P
+        .ent   P
+P:
+        addiu $2,$0,SC_SemP
+        syscall
+        j        $31
+        .end   P
+
+        .globl V
+        .ent   V
+V:
+        addiu $2,$0,SC_SemV
+        syscall
+        j        $31
+        .end   V
 /* dummy function only to keep gcc happy, it's not actually used */
         .globl  __main
         .ent    __main

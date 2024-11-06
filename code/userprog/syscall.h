@@ -40,6 +40,10 @@
 #define SC_GetInt 16
 #define SC_ThreadCreate 17
 #define SC_ThreadExit 18
+#define SC_SemCreate 19
+#define SC_SemDelete 20
+#define SC_SemP 21
+#define SC_SemV 22
 #endif
 
 #ifdef IN_USER_MODE
@@ -149,6 +153,12 @@ void PutInt(int n);
 void GetInt(int *n);
 int ThreadCreate(void f(void *arg), void *arg);
 void ThreadExit(void);
+
+typedef int sem_t;
+sem_t SemaphoreCreate(const char *debugName, int initialValue);
+void SemaphoreDelete(sem_t sem);
+void P(sem_t sem);
+void V(sem_t sem);
 #endif // CHANGED
 #endif // IN_USER_MODE
 

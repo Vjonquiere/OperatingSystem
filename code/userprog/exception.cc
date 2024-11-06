@@ -28,6 +28,7 @@
 #ifdef CHANGED
 #include "utils.h"
 #include "userthread.h"
+#include "synch.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -162,6 +163,31 @@ ExceptionHandler (ExceptionType which)
                 {
                   DEBUG ('s', "ThreadExit\n");
                   do_ThreadExit();
+                  break;
+                }
+                case SC_SemCreate:
+                {
+                  DEBUG ('s', "SemCreate\n");
+                  Semaphore *sem = new Semaphore("userSemaphore", machine->ReadRegister(5));
+                  machine->WriteRegister(2,(int)sem);                
+                  break;
+                }
+                case SC_SemDelete:
+                {
+                  DEBUG ('s', "SemDelete\n");
+                
+                  break;
+                }
+                case SC_SemP:
+                {
+                  DEBUG ('s', "SemP\n");
+                
+                  break;
+                }
+                case SC_SemV:
+                {
+                  DEBUG ('s', "SemV\n");
+                
                   break;
                 }
                 #endif
