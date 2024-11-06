@@ -7,7 +7,7 @@ void funcThread(void* a){
 }
 
 int main(){
-    ThreadCreate(funcThread,(void*)'Z', ThreadExit);
+    ThreadCreate(funcThread,(void*)'Z');
 
     ThreadExit();
     return 0;
