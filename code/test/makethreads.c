@@ -3,11 +3,11 @@
 
 void funcThread(void* a){
     PutChar((int)a);
-    ThreadExit();
+    //ThreadExit();
 }
 
 int main(){
-    ThreadCreate(funcThread,(void*)'Z');
+    ThreadCreate(funcThread,(void*)'Z', ThreadExit);
 
     ThreadExit();
     return 0;

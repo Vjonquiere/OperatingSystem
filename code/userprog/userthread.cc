@@ -4,6 +4,7 @@ typedef struct schmurtz_t {
     int f;
     int arg;
     int stackIndex;
+    int exitAddress;
 }Schmurtz;
 
 
@@ -21,13 +22,14 @@ static void StartUserThread(void *schmurtz){
     machine->WriteRegister (StackReg,(currentThread->space->NumPages()) * PageSize - 256*s->stackIndex);
     DEBUG ('s', "Initializing stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
+    machine->WriteRegister(RetAddrReg, s->exitAddress);
     free(s);
     machine->DumpMem("threads.svg");
     machine->Run();
 
 }
 
-int do_ThreadCreate(int f, int arg){
+int do_ThreadCreate(int f, int arg, int exitAddress){
     int stackIndex =currentThread->space->AllocateUserStack();
     if(stackIndex == -1){
         return -1;
@@ -39,6 +41,7 @@ int do_ThreadCreate(int f, int arg){
     schmurtz->f = f;
     schmurtz->arg = arg;
     schmurtz->stackIndex = stackIndex;
+    schmurtz->exitAddress = exitAddress;
     newThread->Start(StartUserThread, schmurtz);
     return 0;
 }

@@ -3,21 +3,21 @@
 
 void funcThread(void* a){
     PutChar((int)a);
-    ThreadExit();
+    //ThreadExit();
 }
 
 
 void funcThread2(void* a){
     PutChar(GetChar());
-    ThreadExit();
+    //ThreadExit();
 }
 
 int main(){
-    ThreadCreate((void*)&funcThread2,(void*)'Z');
-    ThreadCreate((void*)&funcThread,(void*)'Z');
-    ThreadCreate((void*)&funcThread,(void*)'Z');
-    ThreadCreate((void*)&funcThread,(void*)'Z');
-    ThreadCreate((void*)&funcThread,(void*)'Z');
+    ThreadCreate((void*)&funcThread2,(void*)'Z', ThreadExit);
+    ThreadCreate((void*)&funcThread,(void*)'Z', ThreadExit);
+    ThreadCreate((void*)&funcThread,(void*)'Z', ThreadExit);
+    ThreadCreate((void*)&funcThread,(void*)'Z', ThreadExit);
+    ThreadCreate((void*)&funcThread,(void*)'Z', ThreadExit);
     PutChar('A');
     PutChar('I');
     ThreadExit();
