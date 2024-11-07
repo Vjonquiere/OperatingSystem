@@ -150,7 +150,7 @@ ExceptionHandler (ExceptionType which)
                 case SC_ThreadCreate:
                 {
                   DEBUG ('s', "ThreadCreate\n");
-                  int res = do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5));
+                  int res = do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5), machine->ReadRegister(6));
                   if(res ==-1){
                     DEBUG('s',"Thread not created.\n");
                   }else{
