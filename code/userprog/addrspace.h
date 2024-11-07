@@ -55,7 +55,7 @@ class AddrSpace:public dontcopythis
     #ifdef CHANGED
     int AllocateUserStack();
     int ThreadLeaving();
-    int NewUserSemaphore(const char* name, int value);
+    int NewUserSemaphore(int value);
     void DeleteUserSemaphore(int index);
     int P(int index);
     int V(int index);

@@ -10,7 +10,9 @@ void testSem(void* i){
 }
 
 int main(void){
-    sem_t sem = SemaphoreCreate("semaphore1",1);
+    sem_t sem = SemaphoreCreate(1);
+    sem_t sem1 = SemaphoreCreate(1);
+    sem_t sem2 = SemaphoreCreate(1);
     ThreadCreate(testSem, (void*) sem);
     P(sem);
     V(sem);

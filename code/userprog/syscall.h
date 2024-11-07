@@ -155,7 +155,7 @@ int ThreadCreate(void f(void *arg), void *arg);
 void ThreadExit(void);
 
 typedef int sem_t;
-sem_t SemaphoreCreate(const char *debugName, int initialValue);
+sem_t SemaphoreCreate(int initialValue);
 void SemaphoreDelete(sem_t sem);
 void P(sem_t sem);
 void V(sem_t sem);

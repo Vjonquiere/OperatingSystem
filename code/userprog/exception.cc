@@ -168,7 +168,7 @@ ExceptionHandler (ExceptionType which)
                 case SC_SemCreate:
                 {
                   DEBUG ('s', "SemCreate\n");
-                  int index = currentThread->space->NewUserSemaphore("userSemaphore",machine->ReadRegister(5));
+                  int index = currentThread->space->NewUserSemaphore(machine->ReadRegister(4));
                   machine->WriteRegister(2,index); // send to user the index of the semaphore
                   break;
                 }

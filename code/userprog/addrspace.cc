@@ -146,6 +146,12 @@ AddrSpace::AddrSpace (OpenFile * executable)
 AddrSpace::~AddrSpace ()
 {
   #ifdef CHANGED
+  for (int i=0; i<MAX_SEMAPHORES; i++){ // Loop to delete all user semaphores
+    if (semBitmap->Test(i)){
+        delete userSemaphores[i];
+        semBitmap->Clear(i);
+    }
+  }
   delete threadsMutex;
   delete stackBitmap;
   delete semBitmap;
@@ -337,7 +343,7 @@ int AddrSpace::ThreadLeaving(){
     return r;
 }
 
-int AddrSpace::NewUserSemaphore(const char* name, int value){
+int AddrSpace::NewUserSemaphore( int value){
     semMutex->Acquire();
     int index  = semBitmap->Find();
     if(index == -1){
@@ -347,7 +353,7 @@ int AddrSpace::NewUserSemaphore(const char* name, int value){
     }else{
         DEBUG('s',"Created user semaphore of index %d\n",index);
         semBitmap->Mark(index);
-        userSemaphores[index] = new Semaphore(name, value);
+        userSemaphores[index] = new Semaphore("userSemaphore", value);
     }
     semMutex->Release();
     return index;
