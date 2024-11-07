@@ -168,26 +168,28 @@ ExceptionHandler (ExceptionType which)
                 case SC_SemCreate:
                 {
                   DEBUG ('s', "SemCreate\n");
-                  Semaphore *sem = new Semaphore("userSemaphore", machine->ReadRegister(5));
-                  machine->WriteRegister(2,(int)sem);                
+                  int index = currentThread->space->NewUserSemaphore("userSemaphore",machine->ReadRegister(5));
+                  machine->WriteRegister(2,index); // send to user the index of the semaphore
                   break;
                 }
                 case SC_SemDelete:
                 {
                   DEBUG ('s', "SemDelete\n");
-                
+                  currentThread->space->DeleteUserSemaphore(machine->ReadRegister(4));
                   break;
                 }
                 case SC_SemP:
                 {
                   DEBUG ('s', "SemP\n");
-                
+                  int res = currentThread->space->P(machine->ReadRegister(4));
+                  machine->WriteRegister(2,res); //send to user the error/success code
                   break;
                 }
                 case SC_SemV:
                 {
                   DEBUG ('s', "SemV\n");
-                
+                  int res = currentThread->space->V(machine->ReadRegister(4));
+                  machine->WriteRegister(2,res); //send to user the error/success code
                   break;
                 }
                 #endif

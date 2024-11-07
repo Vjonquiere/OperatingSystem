@@ -26,7 +26,9 @@
 #define UserStacksAreaSize		1024	// increase this as necessary!
 
 #ifdef CHANGED
+#define MAX_SEMAPHORES 16 //max of user space semaphores per process
 class Lock;
+class Semaphore;
 #endif
 
 
@@ -53,13 +55,20 @@ class AddrSpace:public dontcopythis
     #ifdef CHANGED
     int AllocateUserStack();
     int ThreadLeaving();
+    int NewUserSemaphore(const char* name, int value);
+    void DeleteUserSemaphore(int index);
+    int P(int index);
+    int V(int index);
     #endif
 
   private:
     #ifdef CHANGED
-    Lock *mutex;
+    Lock *threadsMutex;
     unsigned int remaining;
     BitMap *stackBitmap;
+    Lock *semMutex;
+    BitMap *semBitmap;
+    Semaphore* userSemaphores[MAX_SEMAPHORES];
     #endif
     NoffHeader noffH;           // Program layout
 
