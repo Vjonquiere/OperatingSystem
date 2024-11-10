@@ -361,6 +361,10 @@ int AddrSpace::NewUserSemaphore( int value){
 
 void AddrSpace::DeleteUserSemaphore(int index){
     semMutex->Acquire();
+    if (index == -1 || !semBitmap->Test(index)){
+        semMutex->Release();
+        return;
+    }
     DEBUG('s', "Deleted user semaphore %d\n", index);
     semBitmap->Clear(index);
     delete userSemaphores[index];
@@ -369,7 +373,7 @@ void AddrSpace::DeleteUserSemaphore(int index){
 
 int AddrSpace::P(int index){
     semMutex->Acquire();
-    if(!semBitmap->Test(index)){
+    if(index == -1 || !semBitmap->Test(index)){
         DEBUG('s',"Tried to access a non existent semaphore\n");
         semMutex->Release();
         return -1;
@@ -383,7 +387,7 @@ int AddrSpace::P(int index){
 
 int AddrSpace::V(int index){
     semMutex->Acquire();
-    if(!semBitmap->Test(index)){
+    if(index == -1 || !semBitmap->Test(index)){
         DEBUG('s',"Tried to access a non existent semaphore\n");
         semMutex->Release();
         return -1;
