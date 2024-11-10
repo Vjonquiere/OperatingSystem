@@ -130,7 +130,7 @@ Lock::Acquire ()
 {
     #ifdef CHANGED
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    DEBUG('s', "Thread: %s is waiting for mutex (%s)\n", currentThread->getName(), name);
+    DEBUG('s', "[MUTEX] thread %s is waiting for mutex (%s)\n", currentThread->getName(), name);
     while (locked)
       {				// lock not available
           queue->Append ((void *) currentThread);        // so go to sleep
@@ -138,7 +138,7 @@ Lock::Acquire ()
       }
     locked=true;
     owner = currentThread;
-     DEBUG('s', "Thread: %s acquired mutex (%s)\n", currentThread->getName(), name);
+     DEBUG('s', "[MUTEX] thread %s acquired mutex (%s)\n", currentThread->getName(), name);
     (void) interrupt->SetLevel (oldLevel);
     #endif
 }
@@ -154,9 +154,9 @@ Lock::Release ()
         if (thread != NULL){
             scheduler->ReadyToRun (thread);
         }  
-        DEBUG('s', "Thread: %s released mutex (%s)\n", currentThread->getName(), name);
+        DEBUG('s', "[MUTEX] thread %s released mutex (%s)\n", currentThread->getName(), name);
     } else {
-        DEBUG('s', "Thread: %s tried to release a mutex it didn't lock\n", currentThread->getName());
+        DEBUG('s', "[MUTEX] thread %s tried to release a mutex it didn't lock\n", currentThread->getName());
     }
     (void) interrupt->SetLevel (oldLevel);
     #endif
