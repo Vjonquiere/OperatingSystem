@@ -3,13 +3,13 @@
 
 void funcThread(void* a){
     PutChar((int)a);
-    ThreadExit();
+    //ThreadExit();
 }
 
 
 void funcThread2(void* a){
     PutChar(GetChar());
-    ThreadExit();
+    //ThreadExit();
 }
 
 int main(){

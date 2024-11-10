@@ -3,7 +3,7 @@
 
 void funcThread(void* a){
     PutChar((int)a);
-    ThreadExit();
+    //ThreadExit();
 }
 
 int main(){
