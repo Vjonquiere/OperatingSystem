@@ -84,34 +84,34 @@ ExceptionHandler (ExceptionType which)
               {
                 case SC_Halt:
                   {
-                    DEBUG ('s', "Shutdown, initiated by user program.\n");
+                    DEBUG ('s', "[EH] Halt\nShutdown, initiated by user program.\n");
                     interrupt->Powerdown ();
                     break;
                   }
                 #ifdef CHANGED
                 case SC_PutChar:
                   {
-                    DEBUG ('s', "PutChar\n");
+                    DEBUG ('s', "[EH] PutChar\n");
                     consoledriver->PutChar (machine->ReadRegister(4));
                     break;
                   }
                 case SC_GetChar:
                   {
-                    DEBUG ('s', "GetChar\n");
+                    DEBUG ('s', "[EH] GetChar\n");
                     machine->WriteRegister(2, consoledriver->GetChar ());
                     DEBUG ('s', "written char %d\n", machine->ReadRegister(2));
                     break;
                   }
                 case SC_Exit:
                   {
-                    DEBUG ('s', "Shutdown, initiated by user program.\n");
+                    DEBUG ('s', "[EH] Exit\nShutdown, initiated by user program.\n");
                     printf("Main return: %d\n", machine->ReadRegister(4)); // ?
                     interrupt->Powerdown ();
                     break;
                   }
                 case SC_PutString:
                   {
-                    DEBUG ('s', "PutString\n");
+                    DEBUG ('s', "[EH] PutString\n");
                     unsigned int charRead =MAX_STRING_SIZE;
                     char* buffer= (char*)malloc(sizeof(char)*MAX_STRING_SIZE);
                     int addressString = machine->ReadRegister(4);
@@ -125,7 +125,7 @@ ExceptionHandler (ExceptionType which)
                   }
                 case SC_GetString:
                   {
-                    DEBUG ('s', "GetString\n");
+                    DEBUG ('s', "[EH] GetString\n");
                     char* buffer = (char*)malloc(sizeof(char)*machine->ReadRegister(5));
                     consoledriver->GetString(buffer, machine->ReadRegister(5));
                     copyStringToMachine(buffer, machine->ReadRegister(4), machine->ReadRegister(5));
@@ -135,13 +135,13 @@ ExceptionHandler (ExceptionType which)
                   }
                 case SC_PutInt:
                   {
-                    DEBUG ('s', "PutInt\n");
+                    DEBUG ('s', "[EH] PutInt\n");
                     consoledriver->PutInt(machine->ReadRegister(4));
                     break;
                   }
                 case SC_GetInt:
                   {
-                    DEBUG ('s', "GetInt\n");
+                    DEBUG ('s', "[EH] GetInt\n");
                     int *n = (int*)malloc(sizeof(int));
                     consoledriver->GetInt(n);
                     copyIntToMachine(n, machine->ReadRegister(4));
@@ -150,44 +150,39 @@ ExceptionHandler (ExceptionType which)
                   }
                 case SC_ThreadCreate:
                 {
-                  DEBUG ('s', "ThreadCreate\n");
-                  int res = do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5));
-                  if(res ==-1){
-                    DEBUG('s',"Thread not created.\n");
-                  }else{
-                     DEBUG('s',"Thread created.\n");
-                  }
+                  DEBUG ('s', "[EH] ThreadCreate\n");
+                  do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5));
                   break;
                 }
                 case SC_ThreadExit:
                 {
-                  DEBUG ('s', "ThreadExit\n");
+                  DEBUG ('s', "[EH] ThreadExit\n");
                   do_ThreadExit();
                   break;
                 }
                 case SC_SemCreate:
                 {
-                  DEBUG ('s', "SemCreate\n");
+                  DEBUG ('s', "[EH] SemCreate\n");
                   int index = currentThread->space->NewUserSemaphore(machine->ReadRegister(4));
                   machine->WriteRegister(2,index); // send to user the index of the semaphore
                   break;
                 }
                 case SC_SemDelete:
                 {
-                  DEBUG ('s', "SemDelete\n");
+                  DEBUG ('s', "[EH] SemDelete\n");
                   currentThread->space->DeleteUserSemaphore(machine->ReadRegister(4));
                   break;
                 }
                 case SC_SemP:
                 {
-                  DEBUG ('s', "SemP\n");
+                  DEBUG ('s', "[EH] SemP\n");
                   int res = currentThread->space->P(machine->ReadRegister(4));
                   machine->WriteRegister(2,res); //send to user the error/success code
                   break;
                 }
                 case SC_SemV:
                 {
-                  DEBUG ('s', "SemV\n");
+                  DEBUG ('s', "[EH] SemV\n");
                   int res = currentThread->space->V(machine->ReadRegister(4));
                   machine->WriteRegister(2,res); //send to user the error/success code
                   break;

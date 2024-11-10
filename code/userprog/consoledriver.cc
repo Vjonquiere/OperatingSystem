@@ -45,7 +45,8 @@ int ConsoleDriver::GetChar()
 void ConsoleDriver::PutString(const char *s)
 {
     if(s == NULL){
-        DEBUG('s',"tried to putstring a null string");
+        DEBUG('s',"[ERROR] tried to PutString a null string\n");
+        return;
     }
     while (*s != '\0')
     {
@@ -56,7 +57,8 @@ void ConsoleDriver::PutString(const char *s)
 void ConsoleDriver::GetString(char *s, int n)
 {
  if (s == NULL){
-    DEBUG('s',"tried to get a null string");
+    DEBUG('s',"[ERROR] tried to GetString a null string");
+    return;
  }
  for (int i = 0; i<n-1; i++){
     int c = GetChar();
@@ -86,7 +88,7 @@ void ConsoleDriver::GetInt(int *n)
     char* buffer = (char*)malloc(sizeof(char)*MAX_INT_SIZE);
     GetString(buffer, MAX_INT_SIZE);
     if (buffer[0] != '-'){
-        buffer[MAX_INT_SIZE-2] = '\0'; // If the string is positive we need to forgot the last digit
+        buffer[MAX_INT_SIZE-2] = '\0'; // If the string is positive we need to forget the last digit
     }
     sscanf(buffer, "%d", n);
     free(buffer);

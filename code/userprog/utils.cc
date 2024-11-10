@@ -4,7 +4,8 @@
 unsigned copyStringFromMachine(int from, char *to, unsigned size){
     int* tmp = (int*) malloc(sizeof(int));
     if(tmp == NULL){
-        DEBUG('t',"tried to copyStringFromMachine with a null pointer");
+        DEBUG('t',"[ERROR] tried to copyStringFromMachine with a null pointer");
+        return 0;
     }
     unsigned int i;
     for( i=0; i< size; i++){ //on ne note que size-1 char, le dernier est le '/0
@@ -26,7 +27,8 @@ unsigned copyStringFromMachine(int from, char *to, unsigned size){
 
 unsigned copyStringToMachine(char* from, int to, unsigned size){
     if(from == NULL){
-        DEBUG('t',"tried to copyStringFromMachine with a null pointer");
+        DEBUG('t',"[ERROR] tried to copyStringFromMachine with a null pointer");
+        return 0;
     }
     unsigned int i;
     for( i=0; i< size; i++){
@@ -43,7 +45,8 @@ unsigned copyStringToMachine(char* from, int to, unsigned size){
 
 void copyIntToMachine(int* from, int to){
     if (from == NULL){
-        DEBUG('t',"tried to copy a NULL int");
+        DEBUG('t',"[ERROR] tried to copy a NULL int");
+        return;
     }
     machine->WriteMem(to, sizeof(int), *from);
 }

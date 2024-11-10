@@ -156,7 +156,6 @@ AddrSpace::~AddrSpace ()
   delete stackBitmap;
   delete semBitmap;
   delete semMutex;
-  DEBUG('s', "threadsMutex and semMutex deleted\n");
   #endif
   delete [] pageTable;
   pageTable = NULL;
@@ -347,11 +346,11 @@ int AddrSpace::NewUserSemaphore( int value){
     semMutex->Acquire();
     int index  = semBitmap->Find();
     if(index == -1){
-        DEBUG('s', "Maximum number of semaphores already created\n");
+        DEBUG('s', "[USER SYNC] Semaphore not created (maximum number of semaphores already created)\n");
         semMutex->Release();
         return -1;
     }else{
-        DEBUG('s',"Created user semaphore of index %d\n",index);
+        DEBUG('s',"[USER SYNC] Created user semaphore of index %d\n",index);
         semBitmap->Mark(index);
         userSemaphores[index] = new Semaphore("userSemaphore", value);
     }
@@ -362,10 +361,11 @@ int AddrSpace::NewUserSemaphore( int value){
 void AddrSpace::DeleteUserSemaphore(int index){
     semMutex->Acquire();
     if (index == -1 || !semBitmap->Test(index)){
+        DEBUG('s',"[USER SYNC] Tried to delete a non existent semaphore\n");
         semMutex->Release();
         return;
     }
-    DEBUG('s', "Deleted user semaphore %d\n", index);
+    DEBUG('s', "[USER SYNC] Deleted user semaphore %d\n", index);
     semBitmap->Clear(index);
     delete userSemaphores[index];
     semMutex->Release();
@@ -374,11 +374,11 @@ void AddrSpace::DeleteUserSemaphore(int index){
 int AddrSpace::P(int index){
     semMutex->Acquire();
     if(index == -1 || !semBitmap->Test(index)){
-        DEBUG('s',"Tried to access a non existent semaphore\n");
+        DEBUG('s',"[USER SYNC] Tried to access a non existent semaphore\n");
         semMutex->Release();
         return -1;
     }else{
-        DEBUG('s',"P on user semaphore %d\n", index);
+        DEBUG('s',"[USER SYNC] P on user semaphore %d\n", index);
         userSemaphores[index]->P();
     }
     semMutex->Release();
@@ -388,11 +388,11 @@ int AddrSpace::P(int index){
 int AddrSpace::V(int index){
     semMutex->Acquire();
     if(index == -1 || !semBitmap->Test(index)){
-        DEBUG('s',"Tried to access a non existent semaphore\n");
+        DEBUG('s',"[USER SYNC] Tried to access a non existent semaphore\n");
         semMutex->Release();
         return -1;
     }else{
-        DEBUG('s',"V on user semaphore %d\n", index);
+        DEBUG('s',"[USER SYNC] V on user semaphore %d\n", index);
         userSemaphores[index]->V();
     }
     semMutex->Release();
