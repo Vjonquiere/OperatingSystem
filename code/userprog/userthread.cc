@@ -12,14 +12,14 @@ static void StartUserThread(void *schmurtz){
         machine->WriteRegister (i, 0);
     Schmurtz *s = (Schmurtz*) schmurtz;
     machine->WriteRegister(4,s->arg);
-    DEBUG('s', "[THREAD] Initializing arg in reg 4\n");
+    DEBUG('s', "Initializing arg in reg 4\n");
     machine->WriteRegister(PCReg,s->f);
-    DEBUG('s', "[THREAD] Initializing f in PCReg : 0x%x \n", machine->ReadRegister(PCReg));
+    DEBUG('s', "Initializing f in PCReg : 0x%x \n", machine->ReadRegister(PCReg));
     machine->WriteRegister (NextPCReg, machine->ReadRegister(PCReg) + 4);
-    DEBUG('s', "[THREAD] Initializing NextPCReg\n");
+    DEBUG('s', "Initializing NextPCReg\n");
     currentThread->stackIndex = s->stackIndex;
     machine->WriteRegister (StackReg,(currentThread->space->NumPages()) * PageSize - 256*s->stackIndex);
-    DEBUG ('s', "[THREAD] Initializing stack register to 0x%x\n",
+    DEBUG ('s', "Initializing stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
     free(s);
     machine->DumpMem("threads.svg");
@@ -28,10 +28,8 @@ static void StartUserThread(void *schmurtz){
 }
 
 int do_ThreadCreate(int f, int arg){
-    DEBUG('s', "[THREAD] Thread creation began\n");
     int stackIndex =currentThread->space->AllocateUserStack();
     if(stackIndex == -1){
-        DEBUG('s', "[THREAD] Thread creation failed (can't allocate a stack)\n");
         return -1;
     }
     Thread *newThread = new Thread("UserThread");
@@ -42,15 +40,12 @@ int do_ThreadCreate(int f, int arg){
     schmurtz->arg = arg;
     schmurtz->stackIndex = stackIndex;
     newThread->Start(StartUserThread, schmurtz);
-    DEBUG('s', "[THREAD] Thread has been created\n");
     return 0;
 }
 
 void do_ThreadExit(){
-    DEBUG('s', "[THREAD] Thread exit\n");
     int remaining = currentThread->space->ThreadLeaving();
     if (remaining <= 0){
-        DEBUG('s', "[THREAD] Last thread exited, power down\n");
         delete currentThread->space;
         interrupt->Powerdown();
     }
