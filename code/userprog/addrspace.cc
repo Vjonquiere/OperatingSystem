@@ -71,10 +71,12 @@ AddrSpace::AddrSpace (OpenFile * executable)
 {
     unsigned int i, size;
     #ifdef CHANGED
-    mutex = new Lock("remainingThreads");
+    threadsMutex = new Lock("remainingThreads");
     remaining = 0;
     stackBitmap = new BitMap(UserStacksAreaSize/256);
     stackBitmap->Mark(0); // Main thread use the index 0
+    semMutex = new Lock("UserSemaphores");
+    semBitmap = new BitMap(MAX_SEMAPHORES);
     #endif
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
@@ -144,9 +146,17 @@ AddrSpace::AddrSpace (OpenFile * executable)
 AddrSpace::~AddrSpace ()
 {
   #ifdef CHANGED
-  delete mutex;
+  for (int i=0; i<MAX_SEMAPHORES; i++){ // Loop to delete all user semaphores
+    if (semBitmap->Test(i)){
+        delete userSemaphores[i];
+        semBitmap->Clear(i);
+    }
+  }
+  delete threadsMutex;
   delete stackBitmap;
-  DEBUG('s', "mutex deleted");
+  delete semBitmap;
+  delete semMutex;
+  DEBUG('s', "threadsMutex and semMutex deleted\n");
   #endif
   delete [] pageTable;
   pageTable = NULL;
@@ -305,31 +315,87 @@ AddrSpace::RestoreState ()
 
 #ifdef CHANGED
 int AddrSpace::AllocateUserStack(){
-    mutex->Acquire();
+    threadsMutex->Acquire();
     /* we put the marking of the new thread stack in the bitmap here so we are sure 
     that we have enough space to create it
     it needs to be inside the mutex so two threads are not creted at the same address
     */
     int index = stackBitmap->Find();
     if(index == -1){
-        mutex->Release();
+        threadsMutex->Release();
         return -1;
     }
     else{
         remaining ++;
         stackBitmap->Mark(index);
     }
-    mutex->Release();
+    threadsMutex->Release();
     return index; // mettre a jour la taille du stack pointer avec les autres threads
 }
 
 int AddrSpace::ThreadLeaving(){
-    mutex->Acquire();
+    threadsMutex->Acquire();
     int r = remaining --;
     DEBUG('s', "Clear thread%d\n",currentThread->stackIndex);
     stackBitmap->Clear(currentThread->stackIndex);
-    mutex->Release();
+    threadsMutex->Release();
     DEBUG('s', "Thread going down: %d thread(s) remaining on AddrSpace\n", r);
     return r;
+}
+
+int AddrSpace::NewUserSemaphore( int value){
+    semMutex->Acquire();
+    int index  = semBitmap->Find();
+    if(index == -1){
+        DEBUG('s', "Maximum number of semaphores already created\n");
+        semMutex->Release();
+        return -1;
+    }else{
+        DEBUG('s',"Created user semaphore of index %d\n",index);
+        semBitmap->Mark(index);
+        userSemaphores[index] = new Semaphore("userSemaphore", value);
+    }
+    semMutex->Release();
+    return index;
+}
+
+void AddrSpace::DeleteUserSemaphore(int index){
+    semMutex->Acquire();
+    if (index == -1 || !semBitmap->Test(index)){
+        semMutex->Release();
+        return;
+    }
+    DEBUG('s', "Deleted user semaphore %d\n", index);
+    semBitmap->Clear(index);
+    delete userSemaphores[index];
+    semMutex->Release();
+}
+
+int AddrSpace::P(int index){
+    semMutex->Acquire();
+    if(index == -1 || !semBitmap->Test(index)){
+        DEBUG('s',"Tried to access a non existent semaphore\n");
+        semMutex->Release();
+        return -1;
+    }else{
+        DEBUG('s',"P on user semaphore %d\n", index);
+        userSemaphores[index]->P();
+    }
+    semMutex->Release();
+    return 0;
+}
+
+int AddrSpace::V(int index){
+    semMutex->Acquire();
+    if(index == -1 || !semBitmap->Test(index)){
+        DEBUG('s',"Tried to access a non existent semaphore\n");
+        semMutex->Release();
+        return -1;
+    }else{
+        DEBUG('s',"V on user semaphore %d\n", index);
+        userSemaphores[index]->V();
+    }
+    semMutex->Release();
+    return 0;
 }
 #endif
