@@ -372,30 +372,24 @@ void AddrSpace::DeleteUserSemaphore(int index){
 }
 
 int AddrSpace::P(int index){
-    semMutex->Acquire();
     if(index == -1 || !semBitmap->Test(index)){
         DEBUG('s',"[USER SYNC] Tried to access a non existent semaphore\n");
-        semMutex->Release();
         return -1;
     }else{
         DEBUG('s',"[USER SYNC] P on user semaphore %d\n", index);
         userSemaphores[index]->P();
     }
-    semMutex->Release();
     return 0;
 }
 
 int AddrSpace::V(int index){
-    semMutex->Acquire();
     if(index == -1 || !semBitmap->Test(index)){
         DEBUG('s',"[USER SYNC] Tried to access a non existent semaphore\n");
-        semMutex->Release();
         return -1;
     }else{
         DEBUG('s',"[USER SYNC] V on user semaphore %d\n", index);
         userSemaphores[index]->V();
     }
-    semMutex->Release();
     return 0;
 }
 #endif
