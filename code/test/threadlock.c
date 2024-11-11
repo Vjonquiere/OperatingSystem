@@ -23,7 +23,7 @@ int main(){
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
 then execute the following command:
-./userprog/nachos -x test/threadlock
+./userprog/nachos -rs 1234 -x test/threadlock
 
 The test creates multiple threads that attempt to access `PutChar` and `GetChar` simultaneously.
 The purpose is to ensure that concurrent calls to `PutChar` and `GetChar` are properly synchronized,
@@ -33,6 +33,7 @@ are printed by the main thread, allowing us to observe if characters appear in t
 To finish the test you need to make an input to send the `PutChar` call and see the character written
 in the console. 
 
+To see all threads, mutexes debugs labels add `-d s` to the launch command 
 
 */
 
