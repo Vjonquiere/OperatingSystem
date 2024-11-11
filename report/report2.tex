@@ -21,6 +21,17 @@
 \pagebreak
 
 \section{Bilan}
+Toutes les actions semblent fonctionner dans l'ensemble, mais nous avons rencontré 
+un problème avec l'utilisation de \textit{printf}. En effet, cette fonction ne gère pas 
+correctement les boucles \textit{for}, ce qui rend son utilisation compliquée dans notre
+projet. Pour contourner cette limitation, nous avons utilisé \textit{PutString} et 
+\textit{PutInt} à la place de \textit{printf} dans nos tests et nos implémentations, 
+ce qui a permis d'éviter des erreurs inattendues lors de l'affichage. Nous avons tenté de le 
+modifier en le sécurisant avec des sémaphores, mais sans succès. Notre code de \textit{vsprintf.c}
+se trouve dans l'espace utilisateur et ne comporte pas de main où créer le sémaphore comme dans
+nos programmes de tests. Nous ne pouvions pas non plus faire comme pour \textit{PutString}
+car nous ne sommes pas en espace noyau. La partie I ne nous a pas particulièrement posé de problèmes, nous
+ne nous sommes pas attardés dessus dans le rapport.
 
 \section{Points Délicats}
 \subsection{Partie II}
@@ -41,10 +52,11 @@ thread utilisant également \textit{PutString}, ce qui entremêlerait les deux s
 
 
 Avant de faire l'\textit{Action II.3}, si nous lancions plusieurs threads, ils avaient la même pile.
-Nous ne pouvions pas allouer dynamiquement les threads car nous ne savions pas où se trouvait
+Nous ne pouvions pas allouer dynamiquement les threads, car nous ne savions pas où se trouvait
 la dernière pile allouée. Nous sommes donc passés à l'\textit{Action II.4}. Nous avons délégué
-ces opérations à l'\textit{Address Space}. Nous avons créé un \textit{Bitmap} de la taille du nombre de threads utilisateurs pouvant être créés
-par rapport à la taille de la pile allouée pour les stack des utilisateurs. Avant chaque création
+ces opérations à l'\textit{Address Space}. Nous avons créé un \textit{Bitmap} de taille égale au 
+nombre de threads utilisateurs pouvant être créés par rapport à la taille de la pile allouée pour 
+les stack des utilisateurs (\textit{UserStacksAreaSize/256}). Avant chaque création
 de thread, nous vérifions si nous avons un espace de libre pour la stack et nous créons le thread que s'il y a de la place.
 
 \subsection{Partie III}
@@ -89,7 +101,12 @@ la valeur de départ 1024, ce qui nous donne quatre piles de 256 octets.
 L'utilisateur ne peut donc avoir que 4 threads en simultané. Si nous avons
 besoin de plus, il suffit de modifier la variable. Nous avons gardé cette
 valeur, car il était plus simple de se rendre compte de possibles erreurs avec
-4 threads. TEST
+4 threads.
+
+Lorsque nous n'avons pas de place pour créer un nouveau thread, on ne le crée pas et on renvoie
+\textit{-1}. Il serait peut-être judicieux d'avoir une liste d'attente pour les threads non 
+crées par manque de place. En effet, si nous voulons créer un thread, mais qu'il n'a pas de place,
+il ne se créera pas et donc n'exécutera jamais son code.
 
 \subsection{Partie IV}
 Concernant les sémaphores utilisateurs, nous avons choisi d'avoir un bitmap de
