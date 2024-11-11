@@ -116,6 +116,16 @@ taille 16, donc 16 sémaphores en simultané pour un même espace d'adressage.
 Cette limite est modifiable dans le fichier \textit{addrspace.cc} à
 \textit{MAX\_SEMAPHORES}, dans le cas où 16 serait une limite bien trop faible.
 
+\subsection{Fuites mémoires}
+Comme vu dans la Partie I nous avons eu des fuites mémoires différentes du TD1. Cependant, ces nouveaux types
+de fuites s'expliquent facilement. 
+Tout d'abord, les pertes dues au dernier thread qui s'exécute : celui-ci ne peut pas se supprimer seul et laisse
+donc de la mémoire encore accessible en plus de la \textit{pile} qui n'est pas supprimée. De plus, si le programme
+utilise des sémaphores, ceux-ci ne seront pas libérés proprement et provoqueront d'autres fuites mémoires. 
+Cependant, ces fuites mémoires sont présentes car le dernier processus ne peut pas effectuer le \textit{Cleanup} complet 
+de l'\textit{AddrSpace} car cela reviendrai à se supprimer lui-même. Si nous avions plusieurs processus les \textit{Cleanup}
+d'\textit{AddrSpace} se feraient sans fuites hormis pour le dernier processus.
+
 \section{Tests}
 \subsection{Partie I}
 Pour tester notre première implémentation des threads utilisateur, nous avons choisi de créer des tests les plus concis possibles
