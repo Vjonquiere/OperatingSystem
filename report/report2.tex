@@ -32,6 +32,26 @@ de code que les sémaphores, en mettant un booléen \textit{locked} pour
 représenter l'état du mutex à la place de l'entier \textit{value} ainsi qu'en
 rajoutant un pointeur vers le thread ayant verrouillé le mutex.
 
+Nous avons ensuite utilisé ces mutex afin de sécuriser \textit{PutChar} et \textit{GetChar}.
+Pour cela, nous avons utilisé deux mutex, \textit{writeLock} et \textit{readLock}. Il fallait utiliser
+deux mutex car nous pouvons faire \textit{PutChar(GetChar)} par exemple, ce qui ne fonctionnerait
+pas avec seulement un mutex. Nous avons également protégé \textit{PutString} et \textit{GetString}.
+En effet, sans protection, nous pouvions être interrompus lors d'un changement de contexte par un autre
+thread utilisant également \textit{PutString}, ce qui entremêlerait les deux strings.
+
+
+Avant de faire l'\textit{Action II.3}, si nous lancions plusieurs threads, ils avaient la même pile.
+Nous ne pouvions pas allouer dynamiquement les threads car nous ne savions pas où se trouvait
+la dernière pile allouée. Nous sommes donc passés à l'\textit{Action II.4}. Nous avons délégué
+ces opérations à l'\textit{Address Space}. Nous avons créé un \textit{Bitmap} de la taille du nombre de threads utilisateurs pouvant être créés
+par rapport à la taille de la pile allouée pour les stack des utilisateurs. Avant chaque création
+de thread, nous vérifions si nous avons un espace de libre pour la stack et nous créons le thread que s'il y a de la place.
+
+\subsection{Partie III}
+Si un thread n'appelait pas \textit{ThreadExit}, il ne pouvait pas se détruire. Pour éviter cela, nous avons implémenté la terminaison 
+automatique (mis à part pour le thread \textit{main}). Nous avons utilisé une autre méthode que celle donnée dans le TD.
+
+
 \subsection{Partie IV}
 Lorsque nous avons voulu remonter l'utilisation des sémaphores vers l'espace
 utilisateur, nous avons beaucoup réfléchi à l'implémentation. Nous avons
