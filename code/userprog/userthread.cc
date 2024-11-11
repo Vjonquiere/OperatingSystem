@@ -24,7 +24,7 @@ static void StartUserThread(void *schmurtz){
            machine->ReadRegister(StackReg));
     machine->WriteRegister(RetAddrReg, s->exitAddress);
     free(s);
-    machine->DumpMem("threads.svg");
+    //machine->DumpMem("threads.svg");
     machine->Run();
 
 }

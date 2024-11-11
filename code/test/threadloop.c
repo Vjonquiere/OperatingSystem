@@ -11,7 +11,7 @@ void funcThread(void* a){
         P(mutex);
         PutString("Thread ");
         PutChar((int)a);
-        PutChar((int)': ');
+        PutChar((int)':');
         PutInt((int)i);
         PutChar((int)'\n');
         V(mutex);
@@ -20,7 +20,6 @@ void funcThread(void* a){
 
 
 int main(){
-    int i;
     mutex = SemaphoreCreate(1);
     ThreadCreate(funcThread,(void*)'B');
     ThreadCreate(funcThread,(void*)'A');
