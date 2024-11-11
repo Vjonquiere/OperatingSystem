@@ -151,7 +151,8 @@ ExceptionHandler (ExceptionType which)
                 case SC_ThreadCreate:
                 {
                   DEBUG ('s', "[SYSCALL] ThreadCreate\n");
-                  do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5), machine->ReadRegister(6));
+                  int created = do_ThreadCreate(machine->ReadRegister(4),machine->ReadRegister(5), machine->ReadRegister(6));
+                  machine->WriteRegister(2,created);
                   break;
                 }
                 case SC_ThreadExit:

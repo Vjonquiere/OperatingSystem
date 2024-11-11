@@ -8,6 +8,8 @@ static Semaphore *readAvail;
 static Semaphore *writeDone;
 static Lock *writeLock;
 static Lock *readLock;
+static Lock *putStringLock;
+static Lock *getStringLock;
 static void ReadAvailHandler(void *arg) { (void) arg; readAvail->V(); }
 static void WriteDoneHandler(void *arg) { (void) arg; writeDone->V(); }
 
@@ -18,6 +20,8 @@ ConsoleDriver::ConsoleDriver(const char *in, const char *out)
     console = new Console(in, out, ReadAvailHandler, WriteDoneHandler, NULL);
     writeLock = new Lock("write");
     readLock = new Lock("read");
+    putStringLock = new Lock("putString");
+    getStringLock = new Lock("getString");
 }
 
 ConsoleDriver::~ConsoleDriver()
@@ -27,6 +31,8 @@ ConsoleDriver::~ConsoleDriver()
     delete readAvail;
     delete writeLock;
     delete readLock;
+    delete putStringLock;
+    delete getStringLock;
 }
 
 void ConsoleDriver::PutChar(int ch)
@@ -48,31 +54,35 @@ void ConsoleDriver::PutString(const char *s)
         DEBUG('s',"[ERROR] tried to PutString a null string\n");
         return;
     }
+    putStringLock->Acquire();
     while (*s != '\0')
     {
         PutChar(*s);
         s++;
     }
+    putStringLock->Release();
 }
 void ConsoleDriver::GetString(char *s, int n)
 {
- if (s == NULL){
-    DEBUG('s',"[ERROR] tried to GetString a null string");
-    return;
- }
- for (int i = 0; i<n-1; i++){
-    int c = GetChar();
-    if (c == EOF){
-        break;
+    if (s == NULL){
+        DEBUG('s',"[ERROR] tried to GetString a null string");
+        return;
     }
-    if (c == '\n'){
+    getStringLock->Acquire();
+    for (int i = 0; i<n-1; i++){
+        int c = GetChar();
+        if (c == EOF){
+            break;
+        }
+        if (c == '\n'){
+            *s = c;
+            break;
+        }
         *s = c;
-        break;
+        s++;
     }
-    *s = c;
-    s++;
- }
- *s='\0';
+    *s='\0';
+    getStringLock->Release();
 }
 
 void ConsoleDriver::PutInt(int n)
