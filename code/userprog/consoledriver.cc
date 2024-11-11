@@ -44,8 +44,10 @@ void ConsoleDriver::PutChar(int ch)
 }
 int ConsoleDriver::GetChar()
 {
+    readLock->Acquire();
     readAvail->P ();        // wait for character to arrive
     int redChar = console->RX ();
+    readLock->Release();
     return redChar == EOF ? 0 : redChar ;
 }
 void ConsoleDriver::PutString(const char *s)
