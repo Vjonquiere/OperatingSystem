@@ -23,33 +23,62 @@
 \section{Bilan}
 
 \section{Points Délicats}
-Nous avons passé du temps sur la création de mutex. En effet, nous avons commencé par les créer à l'aide
-des sémaphores initialisés à un afin de ne pas copier/coller la quasi-totalité de leurs fonctions. Après
-une discussion avec notre chargé de TD, nous avons décidé d'implémenter les mutex sur la base des sémaphores,
-en mettant un booléen \textit{locked} pour représenter l'état du mutex à la place de l'entier \textit{value} ainsi
-qu'en rajoutant un pointeur vers le thread ayant verrouillé le mutex.
+\subsection{Partie II}
+Nous avons passé du temps sur la création de mutex. En effet, nous avons
+commencé par les créer à l'aide des sémaphores initialisés à un afin de ne pas
+copier/coller la quasi-totalité de leurs fonctions. Après une discussion avec
+notre chargé de TD, nous avons décidé d'implémenter les mutex sur la même base
+de code que les sémaphores, en mettant un booléen \textit{locked} pour
+représenter l'état du mutex à la place de l'entier \textit{value} ainsi qu'en
+rajoutant un pointeur vers le thread ayant verrouillé le mutex.
 
-Lorsque nous avons voulu remonter l'utilisation des sémaphores vers l'espace utilisateur, nous avons beaucoup réfléchi à l'implémentation.
-Nous avons rajouté quatre appels systèmes : \textit{SemaphoreCreate}, \textit{SemaphoreDelete}, \textit{P} et \textit{V}. Nous déléguons aux
-threads d'un même espace d'adressage ont accès aux mêmes sémaphores. Pour cela, nous avons un \textit{Bitmap} afin de savoir quels sémaphores sont 
-créés et un tableau de Sémaphores pour les stocker. L'utilisateur n'a réellement accès qu'à l'indice de son sémaphore.
+\subsection{Partie IV}
+Lorsque nous avons voulu remonter l'utilisation des sémaphores vers l'espace
+utilisateur, nous avons beaucoup réfléchi à l'implémentation. Nous avons
+rajouté quatre appels systèmes : \textit{SemaphoreCreate},
+\textit{SemaphoreDelete}, \textit{P} et \textit{V}. Nous déléguons aux threads
+d'un même espace d'adressage ont accès aux mêmes sémaphores. Pour cela, nous
+avons un \textit{Bitmap} afin de savoir quels sémaphores sont créés et un
+tableau de Sémaphores pour les stocker. L'utilisateur n'a réellement accès qu'à
+l'indice de son sémaphore. Lorsque nous avons commencé à écrire nos fonctions P
+et V dans \textit{addrspace.cc}, nous avions protégé les fonctions à l'aide
+d'un mutex. Cela nous a mené à des deadlocks lorsque nous avons testé
+l'implémentation avec le test producer-consumer. Nous avons donc retiré ce
+mutex, en effet, les fonctions P et V de \textit{synch.cc} gèrent déjà la
+concurrence des threads.
+
+\subsection{Tests}
+Lorsque nous avons fait nos tests, nous avons eu un problème avec notre
+\textit{printf}. En effet, nous nous sommes rendus compte qu'il ne gérait pas
+les boucles for. Nous n'avons pas réussi à expliquer le comportement de notre
+fonction et avons donc choisi d'utiliser des \textit{PutString} et
+\textit{PutInt} à la place.
 
 \section{Limitations}
-Nous utilisons la variable \textit{UserStacksAreaSize} du fichier \textit{addrspace.h} afin de créer les piles de nos threads. Nous avons gardé la valeur de départ 1024, 
-ce qui nous donne quatre piles de 256 octets. L'utilisateur ne peut donc avoir que 4 threads en simultané. Si nous avons besoin de plus, il suffit de modifier la variable. 
-Nous avons gardé cette valeur, car il était plus simple de se rendre compte de possibles erreurs avec 4 threads.
+\subsection{Partie I}
+Beaucoup de memory leak avec les threads : les fonctions de Cleanup ne
+suppriment pas la stack. En effet, il y a bien une fonction
+\textit{StackAllocate} mais pas de \textit{StackDeallocate}. Nous nous
+retrouvons donc avec 73K octets non supprimés à la fin de l'exécution lorsque
+nous utilisons des threads.
 
-Beaucoup de memory leak avec les threads : les fonctions de Cleanup ne suppriment pas la stack.
-En effet, il y a bien une fonction \textit{StackAllocate} mais pas de \textit{StackDeallocate}.
-Nous nous retrouvons donc avec 73K octets non supprimés à la fin de l'exécution lorsque nous utilisons des threads.
+\subsection{Partie II}
+Nous utilisons la variable \textit{UserStacksAreaSize} du fichier
+\textit{addrspace.h} afin de créer les piles de nos threads. Nous avons gardé
+la valeur de départ 1024, ce qui nous donne quatre piles de 256 octets.
+L'utilisateur ne peut donc avoir que 4 threads en simultané. Si nous avons
+besoin de plus, il suffit de modifier la variable. Nous avons gardé cette
+valeur, car il était plus simple de se rendre compte de possibles erreurs avec
+4 threads. TEST
 
-Concernant les sémaphores utilisateurs, nous avons choisi d'avoir un bitmap de taille 16, donc 16 sémaphores en simultané pour un même espace d'adressage.
-Cette limite est modifiable dans le fichier \textit{addrspace.cc} à \textit{MAX_SEMAPHORES}, dans le cas où 16 serait une limite bien trop faible.
-
+\subsection{Partie IV}
+Concernant les sémaphores utilisateurs, nous avons choisi d'avoir un bitmap de
+taille 16, donc 16 sémaphores en simultané pour un même espace d'adressage.
+Cette limite est modifiable dans le fichier \textit{addrspace.cc} à
+\textit{MAX\_SEMAPHORES}, dans le cas où 16 serait une limite bien trop faible.
 
 \section{Tests}
 
 \section{Brouillon}
-
 
 \end{document}
