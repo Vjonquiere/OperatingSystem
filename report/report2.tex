@@ -36,7 +36,7 @@ ne nous sommes pas attardés dessus dans le rapport.
 \section{Points Délicats}
 \subsection{Partie II}
 Nous avons passé du temps sur la création de mutex. En effet, nous avons
-commencé par les créer à l'aide des sémaphores initialisés à un afin de ne pas
+commencé par les créer à l'aide des sémaphores initialisés à 1 afin de ne pas
 copier/coller la quasi-totalité de leurs fonctions. Après une discussion avec
 notre chargé de TD, nous avons décidé d'implémenter les mutex sur la même base
 de code que les sémaphores, en mettant un booléen \textit{locked} pour
@@ -61,17 +61,19 @@ de thread, nous vérifions si nous avons un espace de libre pour la stack et nou
 
 \subsection{Partie III}
 Si un thread n'appelait pas \textit{ThreadExit}, il ne pouvait pas se détruire. Pour éviter cela, nous avons implémenté la terminaison 
-automatique (mis à part pour le thread \textit{main}). Nous avons utilisé une autre méthode que celle donnée dans le TD.
+automatique (mis à part pour le thread \textit{main}). Nous avons utilisé une autre méthode que celle donnée dans le TD en plaçant 
+directement l'adresse de la fonction \textit{ThreadExit} dans le registre 6 (pour le passer comme argument) et rendre le code indépendant
+de l'adresse de chargement de la fonction \textit{ThreadExit}.
 
 
 \subsection{Partie IV}
 Lorsque nous avons voulu remonter l'utilisation des sémaphores vers l'espace
 utilisateur, nous avons beaucoup réfléchi à l'implémentation. Nous avons
 rajouté quatre appels systèmes : \textit{SemaphoreCreate},
-\textit{SemaphoreDelete}, \textit{P} et \textit{V}. Nous déléguons aux threads
+\textit{SemaphoreDelete}, \textit{P} et \textit{V}. Les threads
 d'un même espace d'adressage ont accès aux mêmes sémaphores. Pour cela, nous
 avons un \textit{Bitmap} afin de savoir quels sémaphores sont créés et un
-tableau de Sémaphores pour les stocker. L'utilisateur n'a réellement accès qu'à
+tableau de Sémaphores pour les stocker. L'utilisateur a uniquement accès à
 l'indice de son sémaphore. Lorsque nous avons commencé à écrire nos fonctions P
 et V dans \textit{addrspace.cc}, nous avions protégé les fonctions à l'aide
 d'un mutex. Cela nous a mené à des deadlocks lorsque nous avons testé
@@ -115,7 +117,41 @@ Cette limite est modifiable dans le fichier \textit{addrspace.cc} à
 \textit{MAX\_SEMAPHORES}, dans le cas où 16 serait une limite bien trop faible.
 
 \section{Tests}
+\subsection{Partie I}
+Pour tester notre première implémentation des threads utilisateur, nous avons choisi de créer des tests les plus concis possibles
+afin de pouvoir trouver plus rapidement les bugs qui pourraient y être liés. Nous avons donc commencé par tester les appels systèmes
+\textit{SC\_ThreadCreate} et \textit{SC\_ThreadExit} avec le test \textit{test/makethreads}. Même si celui-ci a changé au cours du 
+développement des threads utilisateurs, on peut voir que son intérêt principal était de voir si l'on arrivait a exécuté du code dans
+un thread (qui n'était pas le thread \textit{main}). 
 
-\section{Brouillon}
+\subsection{Partie II}
+Les tests sont devenus beaucoup plus important à partir de cette partie, car le fait d'avoir plusieurs threads en même temps a
+provoqué des bugs plus difficiles à identifier. L'un des enjeux de l'exécution de plusieurs threads simultanément étant de pouvoir
+utiliser les fonctions que nous avions implémentées dans le \textit{TD1}, il a donc fallu les adapter pour les utiliser.
+Nous avons donc commencé et testé l'adaptation sur \textit{PutChar} et \textit{GetChar} sans problème avec les programmes
+\textit{test/threadlock} et \textit{test/threadgetchar}. En effet celui-ci permet de mettre des appels en concurrence sur ces fonctions 
+et donc de vérifier leur synchronisation. Ce programme permet également de tester notre implémentation de la classe \textit{Lock} dans
+ \textit{synch.cc} car nous avons implémenté la synchronisation de ces fonctions avec ceux-ci. Ces programmes nous on permit de trouver
+ un bug de synchronisation. Nous n'avions pas au préalable protégé les fonctions \textit{GetString} et \textit{PutString}, lorsque nous 
+ avons voulu remplacer les appels à \textit{PutChar} et \textit{GetChar} par \textit{PutString} et \textit{GetString} dans les deux
+ programmes de tests précédents, nous avons commencé à voir des appels qui se mélangeaient (nous avons donc ajouté une synchronisation
+ à ces deux fonctions). Nous avons donc ajouté le test \textit{test/threadstring} qui permet de tester la synchronisation de ces fonctions.
+ De plus, pour vérifier le bon fonctionnement de notre allocation de pile, nous avons ajouté le test \textit{test/threadloop}. Celui-ci 
+ permet de vérifier que les variables sur la pile sont bien locales à chaque thread (et que donc les piles sont bien allouées) grâce à une boucle
+ \textit{for} qui est exécutée en parallèle sur 3 threads. C'est également dans ce test que nous avons découvert le bug du \textit{printf} dans
+ les boucles (nous avons donc utilisé un mutex et des appels successifs à \textit{PutChar}, \textit{PutString} et \textit{PutInt} pour simuler le \textit{printf}).
+ Enfin, pour vérifier notre système de création de thread et d'allocation des piles, nous avons créé le test \textit{test/maxthreadcreate}. Ce test doit créer
+ une série de 5 threads, mais \textit{AddrSpace} n'a de la place que pour 4 pile par défaut. Donc si tous les threads se créaient avant qu'un ait pu finir
+ (ce qu'il est censé se passer avec les arguments de test par défaut), au moins 1 thread ne doit pas réussir à se créer. Cependant, le programme ne se fini 
+ pas brutalement et se contente de remonter la valeur -1 à l'appel \textit{ThreadCreate} pour signaler que le thread n'est pas créé.
+\subsection{Partie III}
+Cette partie n'a pas de test en particulier, car nous avons retiré les appels à \textit{ThreadExit} dans toutes nos fonctions de test.
+Comme tous nos tests s'exécutent de la même manière sans cet appel, nous considérons que chacun est un test de la terminaison automatique.
+
+\subsection{Partie IV}
+Pour tester les sémaphores utilisateurs, nous avons créé deux programmes. Le premier, \textit{semaphoresyscalls} permet de tester
+les différentes fonctions et appels systèmes que nous avons implémentés. Le second correspond au programme producteur-consommateur 
+demandé (basé sur l'exemple présent dans le cours). Cependant, nous avons dû apporter quelques modifications car nous n'avons pas 
+accès aux files côté utilisateur. Nous avons donc détaillé notre implémentation dans le commentaire de ce test.
 
 \end{document}
