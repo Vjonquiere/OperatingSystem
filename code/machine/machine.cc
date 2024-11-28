@@ -70,7 +70,9 @@ Machine::Machine(bool debug)
 #endif
     currentPageTable = NULL;
     currentPageTableSize = 0;
-
+    #ifdef CHANGED
+    pageProvider = new PageProvider(NumPhysPages, PageSize, mainMemory);
+    #endif
     singleStep = debug;
     runUntilTime = 0;
     CheckEndian();
@@ -90,6 +92,9 @@ Machine::~Machine()
         delete [] tlb;
         tlb = NULL;
     }
+    #ifdef CHANGED
+    delete pageProvider;
+    #endif
 }
 
 //----------------------------------------------------------------------
