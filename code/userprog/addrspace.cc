@@ -100,10 +100,14 @@ AddrSpace::AddrSpace (OpenFile * executable)
     #ifdef CHANGED
     threadsMutex = new Lock("remainingThreads");
     remaining = 0;
-    stackBitmap = new BitMap(UserStacksAreaSize/256);
+    stackBitmap = new BitMap(MAX_THREADS);
     stackBitmap->Mark(0); // Main thread use the index 0
+    aliveThreads[0] = currentThread;
     semMutex = new Lock("UserSemaphores");
     semBitmap = new BitMap(MAX_SEMAPHORES);
+    for(i = 0; i<MAX_THREADS; i++){
+        aliveThreads[i] = NULL;
+    }
     #endif
 
     executable->ReadAt (&noffH, sizeof (noffH), 0);
@@ -131,6 +135,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 // first, set up the translation
     pageTable = new TranslationEntry[numPages];
      #ifdef CHANGED
+     ASSERT(machine->pageProvider->NumAvailPage() >= numPages);
         if (machine->pageProvider->NumAvailPage() >= numPages){
             for (i = 0; i < numPages; i++)
         {
@@ -392,10 +397,17 @@ int AddrSpace::AllocateUserStack(){
     return index; // mettre a jour la taille du stack pointer avec les autres threads
 }
 
+void AddrSpace::RegisterThread(){
+    threadsMutex->Acquire();
+    aliveThreads[currentThread->stackIndex] = currentThread;
+    threadsMutex->Release();
+}
+
 int AddrSpace::ThreadLeaving(){
     threadsMutex->Acquire();
     int r = remaining --;
-    DEBUG('s', "[THREAD] Clear thread %d\n",currentThread->stackIndex);
+    DEBUG('s', "[THREAD] Clear thread %s %d \n",currentThread->getName(), currentThread->stackIndex);
+    aliveThreads[currentThread->stackIndex] = NULL;
     stackBitmap->Clear(currentThread->stackIndex);
     threadsMutex->Release();
     DEBUG('s', "[THREAD] Thread going down: %d thread(s) remaining on AddrSpace\n", r);

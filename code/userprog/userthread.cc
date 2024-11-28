@@ -23,6 +23,7 @@ static void StartUserThread(void *schmurtz){
     DEBUG ('s', "[THREAD] Initializing stack register to 0x%x\n",
            machine->ReadRegister(StackReg));
     machine->WriteRegister(RetAddrReg, s->exitAddress);
+    currentThread->space->RegisterThread();
     free(s);
     //machine->DumpMem("threads.svg");
     machine->Run();
@@ -55,7 +56,8 @@ void do_ThreadExit(){
     if (remaining <= 0){
         DEBUG('s', "[THREAD] Last thread exited, power down\n");
         delete currentThread->space;
-        interrupt->Powerdown();
+        
+        //interrupt->Powerdown();
     }
     currentThread->Finish();
 }

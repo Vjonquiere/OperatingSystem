@@ -27,14 +27,18 @@
 
 #ifdef CHANGED
 #define MAX_SEMAPHORES 16 //max of user space semaphores per process
+#define USER_STACK_SIZE 256
+#define MAX_THREADS UserStacksAreaSize/USER_STACK_SIZE
 class Lock;
 class Semaphore;
+class Thread;
 #endif
 
 
 class AddrSpace:public dontcopythis
 {
   public:
+    Thread *aliveThreads[MAX_THREADS];
     AddrSpace (OpenFile * executable); // Create an address space,
     // initializing it with the program
     // stored in the file "executable"
@@ -54,6 +58,7 @@ class AddrSpace:public dontcopythis
 
     #ifdef CHANGED
     int AllocateUserStack();
+    void RegisterThread();
     int ThreadLeaving();
     int NewUserSemaphore(int value);
     void DeleteUserSemaphore(int index);

@@ -44,8 +44,8 @@ ifeq ($(shell [ `$(CC) -dumpversion | cut -d . -f 1` -ge 12 ] && echo ok),ok)
 CFLAGS += -ftrivial-auto-var-init=pattern
 endif
 
-CFLAGS += -fsanitize=address
-LDFLAGS += -fsanitize=address -lpthread
+#CFLAGS += -fsanitize=address
+#LDFLAGS += -fsanitize=address -lpthread
 endif
 
 ifeq ($(NACHOS_SYS),MAC_OS_SYS)
