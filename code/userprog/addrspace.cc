@@ -50,17 +50,17 @@ SwapHeader (NoffHeader * noffH)
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr,
 int numBytes, int position, TranslationEntry *pageTable,
 unsigned numPages){
-    int addrPhys;
+    //int addrPhys;
     TranslationEntry* oldPageTable = machine->currentPageTable;
     unsigned oldNumPages = machine->currentPageTableSize;
     machine->currentPageTable = pageTable;
     machine->currentPageTableSize = numPages;
     char* buffer =  (char*)malloc((size_t)numBytes);
     char* addrBuffer =buffer;
-    machine->Translate(virtualaddr,&addrPhys,numBytes,FALSE,TRUE);
+    //machine->Translate(virtualaddr,&addrPhys,numBytes,FALSE,TRUE);
     executable->ReadAt( (void*)buffer,numBytes,position);
     while(numBytes >0){
-        DEBUG('s', "NumBytes written = %d\n", numBytes);
+        //DEBUG('s', "NumBytes written = %d\n", numBytes);
         machine->WriteMem(virtualaddr,1,*buffer);
         virtualaddr++;
         buffer++;
@@ -130,16 +130,31 @@ AddrSpace::AddrSpace (OpenFile * executable)
            numPages, size);
 // first, set up the translation
     pageTable = new TranslationEntry[numPages];
-    for (i = 0; i < numPages; i++)
-      {
-        pageTable[i].physicalPage = i+1;        // for now, phys page # = virtual page #
-        pageTable[i].valid = TRUE;
-        pageTable[i].use = FALSE;
-        pageTable[i].dirty = FALSE;
-        pageTable[i].readOnly = FALSE;        // if the code segment was entirely on
-        // a separate page, we could set its
-        // pages to be read-only
-      }
+     #ifdef CHANGED
+        if (machine->pageProvider->NumAvailPage() >= numPages){
+            for (i = 0; i < numPages; i++)
+        {
+            pageTable[i].physicalPage = machine->pageProvider->GetRandomEmptyPage();
+            pageTable[i].valid = TRUE;
+            pageTable[i].use = FALSE;
+            pageTable[i].dirty = FALSE;
+            pageTable[i].readOnly = FALSE;        // if the code segment was entirely on
+            // a separate page, we could set its
+            // pages to be read-only
+        }
+        }
+    #else
+        for (i = 0; i < numPages; i++)
+        {
+            pageTable[i].physicalPage = i+1;        // for now, phys page # = virtual page #
+            pageTable[i].valid = TRUE;
+            pageTable[i].use = FALSE;
+            pageTable[i].dirty = FALSE;
+            pageTable[i].readOnly = FALSE;        // if the code segment was entirely on
+            // a separate page, we could set its
+            // pages to be read-only
+        }
+    #endif
 
 // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)
@@ -175,7 +190,9 @@ AddrSpace::AddrSpace (OpenFile * executable)
     pageTable[0].valid = FALSE;			// Catch NULL dereference
 
     AddrSpaceList.Append(this);
-    machine->DumpMem("test.svg");
+    #ifdef CHANGED
+    machine->DumpMem("test.svg"); // remove (only DEBUG)
+    #endif
 }
 
 //----------------------------------------------------------------------
@@ -196,6 +213,9 @@ AddrSpace::~AddrSpace ()
   delete stackBitmap;
   delete semBitmap;
   delete semMutex;
+  for (unsigned int i = 0; i < numPages; i++){
+    machine->pageProvider->ReleasePage(pageTable[i].physicalPage);
+  }
   #endif
   delete [] pageTable;
   pageTable = NULL;

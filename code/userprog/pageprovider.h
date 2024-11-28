@@ -13,6 +13,7 @@ class PageProvider:public dontcopythis
         PageProvider(int numberPages, int sizePage, char* mainMemory);
         ~PageProvider();
         int GetEmptyPage();
+        int GetRandomEmptyPage();
         int ReleasePage(int numPage);
         unsigned NumAvailPage();
     private:
@@ -20,6 +21,7 @@ class PageProvider:public dontcopythis
         Lock*  mutex;
         int pageSize;
         char* memory;
+        int pageCount;
 };
 
 #endif // PAGEPROVIDER_H
