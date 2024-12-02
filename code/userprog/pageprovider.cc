@@ -71,18 +71,30 @@ unsigned PageProvider::NumAvailPage(){
 }
 void PageProvider::AddNewProcess(){
     mutex->Acquire();
-    remainingProcess +=1;
+    remainingProcess ++;
     mutex->Release();
 }
 
 void PageProvider::RemoveProcess(){
     mutex->Acquire();
-    remainingProcess -=1;
+    remainingProcess --;
     mutex->Release();
 }
 
 bool PageProvider::RemainingRunningProcess(){
-    return remainingProcess !=0;
+    bool remaining;
+    mutex->Acquire();
+    remaining = remainingProcess !=0;
+    mutex->Release();
+    return remaining;
+}
+
+int PageProvider::RemainingProcess(){
+    int remaining;
+    mutex->Acquire();
+    remaining = remainingProcess;
+    mutex->Release();
+    return remaining;
 }
 
 

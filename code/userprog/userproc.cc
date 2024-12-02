@@ -42,8 +42,9 @@ int initNewProcess(const char *filename){
 
 void do_ProcessExit(){
     int i;
-    DEBUG('s', "[THREAD] Thread exit\n");
+    DEBUG('s', "[PROC] Process clean\n");
     machine->pageProvider->RemoveProcess();
+    DEBUG('s', "[PROC] %d process remaining\n", machine->pageProvider->RemainingProcess());
     int remaining = machine->pageProvider->RemainingRunningProcess();
     for(i =0; i<MAX_THREADS; i++){
         DEBUG('s', "I= %d\n", i);

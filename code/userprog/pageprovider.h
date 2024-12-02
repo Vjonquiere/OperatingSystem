@@ -19,6 +19,7 @@ class PageProvider:public dontcopythis
         void AddNewProcess();
         void RemoveProcess();
         bool RemainingRunningProcess();
+        int RemainingProcess();
 
     private:
         BitMap* pageBitmap;
