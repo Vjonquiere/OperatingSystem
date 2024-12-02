@@ -82,7 +82,11 @@ void PageProvider::RemoveProcess(){
 }
 
 bool PageProvider::RemainingRunningProcess(){
-    return remainingProcess !=0;
+    bool remaining;
+    mutex->Acquire();
+    remaining =remainingProcess !=0;
+    mutex->Release();
+    return remaining;
 }
 
 

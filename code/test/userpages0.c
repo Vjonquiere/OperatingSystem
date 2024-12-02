@@ -1,14 +1,29 @@
 #ifdef CHANGED
 #include "syscall.h"
+#define THIS "aaa"
+#define THAT "bbb"
+const int N = 10; // Choose it large enough!
 
-int main(void){
+void puts(const char *s)
+{
+    const char *p; for (p = s; *p != '\0'; p++) PutChar(*p);
+}
 
-    PutChar('a');
-    PutChar('b');
-    PutChar('c');
-    PutChar('d');
+void f(void *arg)
+{
+    const char *s = arg;
+    int i;
+    PutChar('x');
+    for (i = 0; i < N; i++)
+    puts(s);
+    ThreadExit();
+}
 
-    return 0;
+int main()
+{
+    ThreadCreate(f, THIS);
+    f(THAT);
+    ThreadExit();
 }
 
 #endif

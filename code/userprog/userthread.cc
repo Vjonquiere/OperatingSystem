@@ -1,5 +1,7 @@
 #ifdef CHANGED
 #include "system.h"
+#include "userproc.h"
+
 typedef struct schmurtz_t {
     int f;
     int arg;
@@ -54,7 +56,8 @@ void do_ThreadExit(){
     DEBUG('s', "[THREAD] Thread exit\n");
     int remaining = currentThread->space->ThreadLeaving();
     if (remaining <= 0){
-        DEBUG('s', "[THREAD] Last thread exited, power down\n");
+        DEBUG('s', "[THREAD] Last thread exited, exit process\n");
+        do_ProcessExit();
         delete currentThread->space;
         
         //interrupt->Powerdown();
