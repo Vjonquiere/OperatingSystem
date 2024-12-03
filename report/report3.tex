@@ -1,0 +1,77 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+\author{
+    Valentin Jonquière,
+    Mathilde Chollon
+}
+
+\title{Rapport TD3 OS}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+\section{Bilan}
+
+\section{Points Délicats}
+\subsection{Partie I}
+\subsubsection{Action I.5}
+La création de la classe \textit{PageProvider} n'a pas vraiment posé de problème. Nous avons
+surtout réfléchi à quelles paramètres donner à cet objet et que sauvegarder. Nous avons 
+adapté notre implémentation au fur a à mesure que nous trouvions des paramètres à rajouter.
+Nous avons décidé de sécuriser notre implémentation avec des \textit{Mutex} dès le départ,
+même si l'arrivée des threads était dans les actions suivantes.
+
+\subsubsection{Action I.6}
+Nous avons passé beaucoup de temps sur cette action. Au départ, la pagination se faisait 
+correctement, mais nous avons rencontré un problème
+ lorsque nous avons tenté d'implémenter la pagination aléatoire. En effet, lorsque nous lancions
+ notre programme, selon l'option utilisée pour l'ordonnanceur (-rs), nous avions des SegFaults.
+ Il était écrit que nous tentions d'accéder à de la mémoire en dehors des adresses physiques (ce qui
+ n'était pas possible du point de vue de notre fonction \textit{getRandomPage()}). Nous avions en fait
+ tenté de faire un \textit{Translate} dans notre fonction \textit{ReadAtVirtual} ce qui provoquait
+ l'erreur. L'adresse physique obtenue n'était même pas utilisée, ce bout de code ayant
+ été fait avant d'avoir totalement compris la fonction.
+\subsection{Partie II}
+\subsubsection{Action II.1}
+Cette partie ne nous a pas posé de problème en particulier. Nous avons pu vérifier que nous
+arrivions à créer de nouveaux processus grâce au \textit{DumpMem}. En effet, cela nous a permis
+de voir que plusieurs processus étaient présents dans la mémoire virtuelle et d'observer les
+correspondances dans la mémoire physique. Nous avons testé les limites de notre implémentation
+en cherchant le maximum de processus pouvant être lancés en même temps, avec différents nombres
+de pages physiques.
+
+\subsubsection{Action II.2}
+\subsection{Partie III}
+
+
+\section{Limitations}
+\subsection{Partie I}
+Nous avons décidé de garder l'allocation des pages aléatoire avec le \textit{PageProvider}. Ce n'est pas
+l'implémentation la plus optimisé puisque lorsque la mémoire se remplit, nous mettons plusieurs itérations avant
+de trouver une page libre. Cependant, nous avons préféré le laisser ainsi, car avec l'allocation linéaire, il y avait
+plus de possibilités que les accès mémoire des threads, locks, processus,... fonctionnent par "chance". Avec l'allocation
+aléatoire, il est beaucoup plus simple de trouver des erreurs si elles sont présentes.
+\subsection{Partie II}
+
+\subsection{Partie III}
+
+\subsection{Fuites mémoires}
+
+\section{Tests}
+\subsection{Partie I}
+
+\subsection{Partie II}
+
+\subsection{Partie III}
+
+\end{document}
