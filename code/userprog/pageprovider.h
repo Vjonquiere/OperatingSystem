@@ -16,12 +16,17 @@ class PageProvider:public dontcopythis
         int GetRandomEmptyPage();
         int ReleasePage(int numPage);
         unsigned NumAvailPage();
+        void AddNewProcess();
+        void RemoveProcess();
+        bool RemainingRunningProcess();
+
     private:
         BitMap* pageBitmap;
         Lock*  mutex;
         int pageSize;
         char* memory;
         int pageCount;
+        unsigned int remainingProcess;
 };
 
 #endif // PAGEPROVIDER_H

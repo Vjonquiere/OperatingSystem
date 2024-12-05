@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "userthread.h"
 #include "synch.h"
+#include "userproc.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -106,7 +107,7 @@ ExceptionHandler (ExceptionType which)
                   {
                     DEBUG ('s', "[SYSCALL] Exit\nShutdown, initiated by user program.\n");
                     printf("Main return: %d\n", machine->ReadRegister(4)); // ?
-                    interrupt->Powerdown ();
+                    do_ProcessExit();
                     break;
                   }
                 case SC_PutString:
@@ -186,6 +187,21 @@ ExceptionHandler (ExceptionType which)
                   DEBUG ('s', "[SYSCALL] SemV\n");
                   int res = currentThread->space->V(machine->ReadRegister(4));
                   machine->WriteRegister(2,res); //send to user the error/success code
+                  break;
+                }
+                case SC_ForkExec:
+                {
+                  DEBUG('s', "[SYSCALL] ForkExec\n");
+                  unsigned int charRead =MAX_STRING_SIZE;
+                  char* buffer= (char*)malloc(sizeof(char)*MAX_STRING_SIZE);
+                  int addressString = machine->ReadRegister(4);
+                  while(charRead == MAX_STRING_SIZE){
+                    charRead = copyStringFromMachine(addressString,buffer,MAX_STRING_SIZE);
+                    addressString+=MAX_STRING_SIZE-1;
+                  }
+                  initNewProcess(buffer);
+      
+                  free(buffer);
                   break;
                 }
                 #endif

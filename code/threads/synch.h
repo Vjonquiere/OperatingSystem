@@ -85,6 +85,12 @@ class Lock:public dontcopythis
     // checking in Release, and in
     // Condition variable ops below.
 
+    #ifdef CHANGED
+    Thread* getOwner();
+    void ForceRelease();
+    List* getQueue();
+    #endif
+
   private:
     const char *name;           // for debugging
     // plus some other stuff you'll need to define

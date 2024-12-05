@@ -73,7 +73,7 @@ void ConsoleDriver::GetString(char *s, int n)
     getStringLock->Acquire();
     for (int i = 0; i<n-1; i++){
         int c = GetChar();
-        if (c == EOF){
+        if (c == 0){ // Case EOF: Problem when string like _ _ _ _ OEF (OEF detected only when it is alone)
             break;
         }
         if (c == '\n'){
@@ -104,6 +104,13 @@ void ConsoleDriver::GetInt(int *n)
     }
     sscanf(buffer, "%d", n);
     free(buffer);
+}
+
+Lock* ConsoleDriver::GetPutStringLock(){
+    return putStringLock;
+}
+Lock* ConsoleDriver::GetGetStringLock(){
+    return getStringLock;
 }
 
 #endif // CHANGED

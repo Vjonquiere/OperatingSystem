@@ -16,6 +16,8 @@ class ConsoleDriver:dontcopythis {
         void GetString(char *s, int n); // Behaves like fgets(3S)
         void PutInt(int n);
         void GetInt(int *n);
+        Lock* GetPutStringLock();
+        Lock* GetGetStringLock();
     private:
         Console *console;
 };

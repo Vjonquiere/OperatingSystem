@@ -27,8 +27,11 @@
 
 #ifdef CHANGED
 #define MAX_SEMAPHORES 16 //max of user space semaphores per process
+#define USER_STACK_SIZE 256
+#define MAX_THREADS UserStacksAreaSize/USER_STACK_SIZE
 class Lock;
 class Semaphore;
+class Thread;
 #endif
 
 
@@ -53,7 +56,9 @@ class AddrSpace:public dontcopythis
     unsigned NumPages(void) { return numPages; }
 
     #ifdef CHANGED
+    Thread *aliveThreads[MAX_THREADS];
     int AllocateUserStack();
+    void RegisterThread();
     int ThreadLeaving();
     int NewUserSemaphore(int value);
     void DeleteUserSemaphore(int index);

@@ -9,6 +9,7 @@ PageProvider::PageProvider(int numberPages, int sizePage, char* mainMemory){
     mutex= new Lock("PageProviderLock");
     pageSize = sizePage;
     memory = mainMemory;
+    remainingProcess = 1;
 }
 
 PageProvider::~PageProvider(){
@@ -67,6 +68,25 @@ unsigned PageProvider::NumAvailPage(){
     int count = pageBitmap->NumClear();
     mutex->Release();
     return count;
+}
+void PageProvider::AddNewProcess(){
+    mutex->Acquire();
+    remainingProcess +=1;
+    mutex->Release();
+}
+
+void PageProvider::RemoveProcess(){
+    mutex->Acquire();
+    remainingProcess -=1;
+    mutex->Release();
+}
+
+bool PageProvider::RemainingRunningProcess(){
+    bool remaining;
+    mutex->Acquire();
+    remaining =remainingProcess !=0;
+    mutex->Release();
+    return remaining;
 }
 
 

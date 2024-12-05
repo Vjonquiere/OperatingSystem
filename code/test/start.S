@@ -254,6 +254,15 @@ V:
         syscall
         j        $31
         .end   V
+
+        .globl ForkExec
+        .ent   ForkExec
+ForkExec:
+        addiu $2,$0,SC_ForkExec
+        syscall
+        j        $31
+        .end   ForkExec
+
 /* dummy function only to keep gcc happy, it's not actually used */
         .globl  __main
         .ent    __main
