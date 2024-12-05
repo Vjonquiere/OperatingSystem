@@ -1,6 +1,8 @@
 #ifdef CHANGED
 
 #include "system.h"
+#include "synch.h"
+#include "utils.h"
 
 void StartUserProc(void* arg){
     currentThread->space->InitRegisters ();
@@ -42,14 +44,30 @@ int initNewProcess(const char *filename){
 
 void do_ProcessExit(){
     int i;
+    Lock* l;
     DEBUG('s', "[THREAD] Thread exit\n");
     machine->pageProvider->RemoveProcess();
     int remaining = machine->pageProvider->RemainingRunningProcess();
     for(i =0; i<MAX_THREADS; i++){
         DEBUG('s', "I= %d\n", i);
+        if(currentThread->space->aliveThreads[i] != NULL){
+             removeThreadFromLockQueue(consoledriver->GetGetStringLock(),currentThread->space->aliveThreads[i]);
+             removeThreadFromLockQueue(consoledriver->GetPutStringLock(),currentThread->space->aliveThreads[i]);
+           }
         if (i != currentThread->stackIndex)
-            if (currentThread->space->aliveThreads[i] != NULL)
+            if (currentThread->space->aliveThreads[i] != NULL){
+                DEBUG('s',"thread alive waiting to be killed\n");
+                l = consoledriver->GetPutStringLock();
+                if (l->getOwner() == currentThread->space->aliveThreads[i]){
+                    DEBUG('s',"force release putstring\n");
+                    consoledriver->GetPutStringLock()->ForceRelease();
+                }else if ( consoledriver->GetGetStringLock()->getOwner()== currentThread->space->aliveThreads[i]){
+                     DEBUG('s',"force release getstring\n");
+                     consoledriver->GetGetStringLock()->ForceRelease();
+                }
                 delete currentThread->space->aliveThreads[i];
+            }
+
     }
     delete currentThread->space;
     if (!remaining ){

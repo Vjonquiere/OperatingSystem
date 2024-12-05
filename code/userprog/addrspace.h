@@ -38,7 +38,6 @@ class Thread;
 class AddrSpace:public dontcopythis
 {
   public:
-    Thread *aliveThreads[MAX_THREADS];
     AddrSpace (OpenFile * executable); // Create an address space,
     // initializing it with the program
     // stored in the file "executable"
@@ -57,6 +56,7 @@ class AddrSpace:public dontcopythis
     unsigned NumPages(void) { return numPages; }
 
     #ifdef CHANGED
+    Thread *aliveThreads[MAX_THREADS];
     int AllocateUserStack();
     void RegisterThread();
     int ThreadLeaving();

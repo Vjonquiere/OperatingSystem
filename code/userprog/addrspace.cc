@@ -208,6 +208,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 AddrSpace::~AddrSpace ()
 {
   #ifdef CHANGED
+  DEBUG('s', "Delete adressSpace\n");
   for (int i=0; i<MAX_SEMAPHORES; i++){ // Loop to delete all user semaphores
     if (semBitmap->Test(i)){
         delete userSemaphores[i];

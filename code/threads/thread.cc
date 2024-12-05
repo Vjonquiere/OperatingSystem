@@ -124,6 +124,7 @@ Thread::SetMain (void)
 
 Thread::~Thread ()
 {
+      DEBUG('s', "Delete thread\n");
     DEBUG ('t', "Deleting thread %p \"%s\"\n", this, name);
 
     ASSERT_MSG (this != currentThread, "Cannot destroy ourself!\n");
@@ -226,6 +227,7 @@ Thread::CheckOverflow ()
 void
 Thread::Finish ()
 {
+      DEBUG('s', "Finish thread\n");
     (void) interrupt->SetLevel (IntOff);
     ASSERT_MSG (this == currentThread, "Cannot finish another thread!\n");
 

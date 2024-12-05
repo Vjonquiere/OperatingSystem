@@ -1,5 +1,6 @@
 #ifdef CHANGED
 #include "system.h"
+#include "synch.h"
 
 unsigned copyStringFromMachine(int from, char *to, unsigned size){
     int* tmp = (int*) malloc(sizeof(int));
@@ -50,6 +51,20 @@ void copyIntToMachine(int* from, int to){
         return;
     }
     machine->WriteMem(to, sizeof(int), *from);
+}
+
+void removeThreadFromLockQueue(Lock* l , Thread* t){
+    int i;
+    List* queue = l->getQueue();
+    ListElement* curr = queue->FirstElement();
+    for(i=0;i< queue->Length();i++){
+        if((Thread*)curr->item == t){
+            queue->Remove(curr->item);
+            DEBUG('s', "thread removed from queue\n");
+            break;
+        }
+        curr = curr->next;
+    }
 }
 
 #endif

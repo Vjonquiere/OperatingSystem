@@ -162,6 +162,30 @@ Lock::Release ()
     #endif
 }
 
+#ifdef CHANGED
+Thread* Lock::getOwner(){
+    return owner;
+}
+
+void Lock::ForceRelease(){
+    IntStatus oldLevel = interrupt->SetLevel (IntOff); // stop the interrupst so the operation is "atomic"
+    owner = NULL;
+    locked = false;
+    Thread *thread = (Thread *) queue->Remove (); // wake up a thread waiting for the mutex
+    if (thread != NULL){
+        scheduler->ReadyToRun (thread);
+    }  
+    DEBUG('s', "[MUTEX] Mutex (%s) forced released (thread killed)\n", name);
+
+    (void) interrupt->SetLevel (oldLevel);
+}
+
+List* Lock::getQueue(){
+    return queue;
+}
+
+#endif
+
 Condition::Condition (const char *debugName)
 {
     (void) debugName;
