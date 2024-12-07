@@ -24,12 +24,18 @@
 
 \section{Points Délicats}
 \subsection{Partie I}
+\subsubsection{Action I.2}
+Nous voyons que nous écrivons en mémoire Mips car il n'y a pas de translation d'adresses. De plus, lorsque 
+l'on compare la mémoire physique et la mémoire virtuelle grâce à \textit{DumpMem}, nous pouvons voir que les adresses sont les mêmes.
+
 \subsubsection{Action I.5}
 La création de la classe \textit{PageProvider} n'a pas vraiment posé de problème. Nous avons
-surtout réfléchi à quelles paramètres donner à cet objet et que sauvegarder. Nous avons 
+surtout réfléchi à quels paramètres donner à cet objet et que sauvegarder. Nous avons 
 adapté notre implémentation au fur a à mesure que nous trouvions des paramètres à rajouter.
 Nous avons décidé de sécuriser notre implémentation avec des \textit{Mutex} dès le départ,
-même si l'arrivée des threads était dans les actions suivantes.
+même si l'arrivée des threads était dans les actions suivantes. Il ne faut qu'un seul \textit{PageProvider}
+car si chaque espace d'adressage avait son propre \textit{PageProvider}, il pourrait supprimer des
+pages qui ne lui appartiennent pas.
 
 \subsubsection{Action I.6}
 Nous avons passé beaucoup de temps sur cette action. Au départ, la pagination se faisait 
@@ -41,9 +47,12 @@ correctement, mais nous avons rencontré un problème
  tenté de faire un \textit{Translate} dans notre fonction \textit{ReadAtVirtual} ce qui provoquait
  l'erreur. L'adresse physique obtenue n'était même pas utilisée, ce bout de code ayant
  été fait avant d'avoir totalement compris la fonction.
+
 \subsection{Partie II}
+
 \subsubsection{Action II.1}
-Cette partie ne nous a pas posé de problème en particulier. Nous avons pu vérifier que nous
+Cette partie ne nous a pas posé de problème en particulier, car cela était très similaire à la création 
+de nouveaux threads et au code de \textit{StartProcess}. Nous avons pu vérifier que nous
 arrivions à créer de nouveaux processus grâce au \textit{DumpMem}. En effet, cela nous a permis
 de voir que plusieurs processus étaient présents dans la mémoire virtuelle et d'observer les
 correspondances dans la mémoire physique. Nous avons testé les limites de notre implémentation
@@ -51,21 +60,44 @@ en cherchant le maximum de processus pouvant être lancés en même temps, avec 
 de pages physiques.
 
 \subsubsection{Action II.2}
+
+\subsubsection{Action II.5}
+Afin de sauvegarder la liste des threads encore vivants d'un processus, nous avons créé un tableau de threads dans \textit{AddrSpace}.
+Il est de la taille du maximum de threads pouvant être créé. En effet, comme chaque processus a son propre espace d'adressage, c'est l'endroit
+où garder cette information. Lorsqu'un thread d'un processus appelle \textit{Exit}, nous faisons maintenant une boucle sur tous les threads vivants
+de ce processus, et nous les supprimons.
+
+\subsubsection{Action II.6}
+Nous avons décidé d'implémenter une nouvelle fonction noyau pour les \textit{Locks} : \textit{ForceRelease}. Lorsque nous supprimons tous les threads
+d'un processus comme implémenté à l'action II.3, nous regardons si l'un d'entre eux possède le lock de \textit{PutString} ou  de \textit{GetString},
+et nous relâchons le lock de manière brutale, sans avoir à être le thread ayant acquis le mutex.
+
 \subsection{Partie III}
 
 
 \section{Limitations}
 \subsection{Partie I}
 Nous avons décidé de garder l'allocation des pages aléatoire avec le \textit{PageProvider}. Ce n'est pas
-l'implémentation la plus optimisé puisque lorsque la mémoire se remplit, nous mettons plusieurs itérations avant
+l'implémentation la plus optimisée puisque lorsque la mémoire se remplit, nous mettons plusieurs itérations avant
 de trouver une page libre. Cependant, nous avons préféré le laisser ainsi, car avec l'allocation linéaire, il y avait
 plus de possibilités que les accès mémoire des threads, locks, processus,... fonctionnent par "chance". Avec l'allocation
 aléatoire, il est beaucoup plus simple de trouver des erreurs si elles sont présentes.
+
+\subsubsection{Action II.6}
+La fonction \textit{ForceRelease} que nous avons implémentée casse le principe des locks, qui assure que seul le thread possédant le mutex peut le relâcher.
+C'est une solution brutale, qui n'a donc pas été implémentée coté utilisateur. Nous partons du principe que cette fonction ne doit être utilisé que
+lorsqu'il n'y a pas d'autre choix. Nous avions également pensé à une autre solution : modifier le \textit{Program Counter} du thread possédant
+le mutex pour le placer à l'adresse de \textit{Release}. Cette solution étant beaucoup moins élégante et surtout plus propice à des erreurs lors de la
+modification du registre, nous l'avons rapidement écartée.
+
+\subsubsection{Action II.7}
+Comme discuté dans le rapport 2, la pile du dernier thread n'est pas libérée, car il ne peut pas se supprimer lui-même. il y a aussi des fuites mémoires au niveau
+du dernier \textit{AddrSpace} car on ne peut pas effectuer le \textit{Cleanup} de celui-ci. En revanche les autres espaces d'adressages créés pour les différents
+threads sont bien supprimés.
 \subsection{Partie II}
 
 \subsection{Partie III}
 
-\subsection{Fuites mémoires}
 
 \section{Tests}
 \subsection{Partie I}
