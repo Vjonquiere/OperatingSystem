@@ -47,6 +47,8 @@ void do_ProcessExit(){
     Lock* l;
     DEBUG('s', "[THREAD] Thread exit\n");
     machine->pageProvider->RemoveProcess();
+    machine->pageProvider->proc->Acquire();
+    machine->pageProvider->processWait->Signal(machine->pageProvider->proc);
     int remaining = machine->pageProvider->RemainingRunningProcess();
     for(i =0; i<MAX_THREADS; i++){
         DEBUG('s', "I= %d\n", i);

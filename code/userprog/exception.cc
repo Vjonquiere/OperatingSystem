@@ -106,7 +106,7 @@ ExceptionHandler (ExceptionType which)
                 case SC_Exit:
                   {
                     DEBUG ('s', "[SYSCALL] Exit\nShutdown, initiated by user program.\n");
-                    printf("Main return: %d\n", machine->ReadRegister(4)); // ?
+                    //printf("Main return: %d\n", machine->ReadRegister(4)); // ?
                     do_ProcessExit();
                     break;
                   }
@@ -199,9 +199,21 @@ ExceptionHandler (ExceptionType which)
                     charRead = copyStringFromMachine(addressString,buffer,MAX_STRING_SIZE);
                     addressString+=MAX_STRING_SIZE-1;
                   }
-                  initNewProcess(buffer);
-      
+                  int res = initNewProcess(buffer);
+                  machine->WriteRegister(2,res);
                   free(buffer);
+                  break;
+                }
+                case SC_Wait:
+                {
+                  machine->pageProvider->proc->Acquire();
+                  machine->pageProvider->processWait->Wait(machine->pageProvider->proc);
+
+                  while (machine->pageProvider->RunningProcessCount() > 1){
+                    machine->pageProvider->processWait->Wait(machine->pageProvider->proc);
+                  }
+
+                  machine->pageProvider->proc->Release();
                   break;
                 }
                 #endif
