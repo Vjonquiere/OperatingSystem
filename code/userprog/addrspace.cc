@@ -139,6 +139,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
         if (machine->pageProvider->NumAvailPage() >= numPages){
             for (i = 0; i < numPages; i++)
         {
+            // int physPage = machine->pageProvider->GetEmptyPage(); // Classic allocation
             int physPage = machine->pageProvider->GetRandomEmptyPage();
             ASSERT (physPage != -1); // No page found
             pageTable[i].physicalPage = physPage;
