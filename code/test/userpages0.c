@@ -24,6 +24,14 @@ int main()
     ThreadCreate(f, THIS);
     f(THAT);
     ThreadExit();
+    return 1;
 }
 
+/*
+Helping program for testproc.
+Code given in the subject.
+
+To see all threads, mutexes, processes debugs labels add `-d s` to the launch command 
+
+*/
 #endif
