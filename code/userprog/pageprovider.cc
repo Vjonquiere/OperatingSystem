@@ -18,6 +18,7 @@ PageProvider::~PageProvider(){
     delete pageBitmap;
     delete mutex;
     delete processWait;
+    delete proc;
 }
 
 int PageProvider::GetEmptyPage(){
