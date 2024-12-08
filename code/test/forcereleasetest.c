@@ -12,6 +12,7 @@ main()
     ForkExec("test/testrelease");
     ThreadCreate((void*)&funcThread2,(void*)'Z');
     ThreadExit();
+    return 1;
 }
 
 

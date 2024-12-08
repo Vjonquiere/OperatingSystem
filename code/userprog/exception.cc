@@ -207,7 +207,6 @@ ExceptionHandler (ExceptionType which)
                 {
                   machine->pageProvider->proc->Acquire();
                   machine->pageProvider->processWait->Wait(machine->pageProvider->proc);
-
                   while (machine->pageProvider->RunningProcessCount() > 1){
                     machine->pageProvider->processWait->Wait(machine->pageProvider->proc);
                   }

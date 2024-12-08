@@ -6,5 +6,6 @@ int main(){
     ForkExec("test/threadloopprocess");
     ForkExec("test/threadloopprocess");
     ForkExec("test/threadloopprocess");
+    return 1;
 }
 #endif

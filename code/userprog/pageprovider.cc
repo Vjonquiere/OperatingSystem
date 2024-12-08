@@ -94,7 +94,7 @@ bool PageProvider::RemainingRunningProcess(){
 }
 
 int PageProvider::RunningProcessCount(){
-    bool remaining;
+    int remaining;
     mutex->Acquire();
     remaining =remainingProcess;
     mutex->Release();
