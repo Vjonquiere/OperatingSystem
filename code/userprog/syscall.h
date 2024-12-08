@@ -161,6 +161,7 @@ sem_t SemaphoreCreate(int initialValue);
 void SemaphoreDelete(sem_t sem);
 void P(sem_t sem);
 void V(sem_t sem);
+void Wait();
 
 int ForkExec(const char *s);
 #endif // CHANGED

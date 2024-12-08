@@ -5,6 +5,7 @@
 #include "utils.h"
 
 void StartUserProc(void* arg){
+    if (arg){} // Only to remove warning
     currentThread->space->InitRegisters ();
     currentThread->space->RestoreState ();
     currentThread->stackIndex=0;

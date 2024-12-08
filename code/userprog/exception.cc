@@ -130,7 +130,6 @@ ExceptionHandler (ExceptionType which)
                     char* buffer = (char*)malloc(sizeof(char)*machine->ReadRegister(5));
                     consoledriver->GetString(buffer, machine->ReadRegister(5));
                     copyStringToMachine(buffer, machine->ReadRegister(4), machine->ReadRegister(5));
-                    //consoledriver->PutString (buffer);
                     free(buffer);
                     break;
                   }

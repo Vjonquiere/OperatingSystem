@@ -41,10 +41,10 @@ int PageProvider::GetRandomEmptyPage(){
     int index = random()%pageCount;
     mutex->Acquire();
     int pageInMem;
-    /*if (NumAvailPage() == 0){
+    if (pageBitmap->NumClear() == 0){
         mutex->Release();
         return -1;
-    }*/
+    }
     while (pageBitmap->Test(index)){
         index = random()%pageCount;
     }

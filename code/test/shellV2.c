@@ -8,7 +8,8 @@ main ()
     while(1){
         PutString("[SHELL]:$");
         GetString(buffer, 64);
-        if (ForkExec(buffer) == 0) Wait();
+        if (buffer[0] == 'e' && buffer[1] == '\0') return 1;
+        else if (ForkExec(buffer) == 0) Wait();
         buffer[0] = '\0';
     }
 }

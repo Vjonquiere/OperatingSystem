@@ -139,7 +139,9 @@ AddrSpace::AddrSpace (OpenFile * executable)
         if (machine->pageProvider->NumAvailPage() >= numPages){
             for (i = 0; i < numPages; i++)
         {
-            pageTable[i].physicalPage = machine->pageProvider->GetRandomEmptyPage();
+            int physPage = machine->pageProvider->GetRandomEmptyPage();
+            ASSERT (physPage != -1); // No page found
+            pageTable[i].physicalPage = physPage;
             pageTable[i].valid = TRUE;
             pageTable[i].use = FALSE;
             pageTable[i].dirty = FALSE;
