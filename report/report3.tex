@@ -49,13 +49,22 @@ pages qui ne lui appartiennent pas.
 \subsubsection{Action I.6}
 Nous avons passé beaucoup de temps sur cette action. Au départ, la pagination se faisait 
 correctement, mais nous avons rencontré un problème
- lorsque nous avons tenté d'implémenter la pagination aléatoire. En effet, lorsque nous lancions
- notre programme, selon l'option utilisée pour l'ordonnanceur (-rs), nous avions des SegFaults.
- Il était écrit que nous tentions d'accéder à de la mémoire en dehors des adresses physiques (ce qui
- n'était pas possible du point de vue de notre fonction \textit{getRandomPage()}). Nous avions en fait
- tenté de faire un \textit{Translate} dans notre fonction \textit{ReadAtVirtual} ce qui provoquait
- l'erreur. L'adresse physique obtenue n'était même pas utilisée, ce bout de code ayant
- été fait avant d'avoir totalement compris la fonction.
+lorsque nous avons tenté d'implémenter la pagination aléatoire. En effet, lorsque nous lancions
+notre programme, selon l'option utilisée pour l'ordonnanceur (-rs), nous avions des SegFaults.
+Il était écrit que nous tentions d'accéder à de la mémoire en dehors des adresses physiques (ce qui
+n'était pas possible du point de vue de notre fonction \textit{getRandomPage()}). Nous avions en fait
+tenté de faire un \textit{Translate} dans notre fonction \textit{ReadAtVirtual} ce qui provoquait
+l'erreur. L'adresse physique obtenue n'était même pas utilisée, ce bout de code ayant
+été fait avant d'avoir totalement compris la fonction. Nous avons également protégé la demande des pages par deux \textit{ASSERT},
+le premier à pour objectif de vérifier que le nombre de pages physiques est suffisant pour initialiser un \textit{AddrSpace}.
+Un deuxième vérifie que le \textit{PageProvider} nous retourne une page valide (différente de -1) car si deux processus demandent
+des pages en même temps il est possible qu'il n'y ait pas assez de pages disponibles pour les deux processus même si le premier assert
+est passé (car demander le nombre de pages libres ne les réserve pas). Nous avons ensuite essayé plusieurs modes d'allocation
+des pages que nous avons pu visualiser à l'aide des \textit{DumpMem}. Pour commencer une allocation basique qui fait correspondre les adresses
+physiques aux adresses virtuelles qui donne la figure \ref{fig:alloc_classic} lorsque l'on exécute le programme \textit{alloctypescomparison}.
+Nous avons également testé une allocation basique, mais qui décalait toutes les pages d'une page. Pour finir, nous avons utiliser une méthode 
+d'allocation aléatoire dont le résultat peut être visualisé dans la figure \ref{fig:alloc_random} (qui est également l'image de l'exécution 
+de \textit{alloctypescomparison}).
 
 \subsection{Partie II}
 
@@ -81,7 +90,14 @@ d'un processus comme implémenté à l'action II.3, nous regardons si l'un d'ent
 et nous relâchons le lock de manière brutale, sans avoir à être le thread ayant acquis le mutex.
 
 \subsection{Partie III}
-
+Pour créer un shell basique, il a fallu trouver un moyen d'attendre la fin de l'exécution d'un processus. En effet, l'idée était de simplement créer une
+boucle infinie qui attendait un programme à exécuter, l'exécute et attend la fin de l'exécution pour recommencer. Pour pouvoir attendre la fin de l'exécution,
+nous avons donc implémenté les \textit{Conditions} dans \textit{synch.cc} (en nous inspirant des locks et des sémaphores). Nous avons ensuite implémenté un nouvel
+appel système \textit{Wait} qui permet à un thread d'attendre d'être le dernier processus actif sur la machine. Pour que cette condition soit commune à tous les processus
+de la machine, nous l'avons ajoutée au \textit{PageProvider} et avons également ajouté un lock spécifique à cette condition (toujours dans le \textit{PageProvider}).
+Cet appel système est dangereux, car on peut facilement bloquer la machine en faisant deux appels \textit{Wait} dans des processus différents 
+(aucun des deux ne se réveillera puisqu'ils attendent tous les deux d'être l'unique processus en exécution). Cependant, c'est l'appel dont on a besoin pour réaliser 
+notre shell. Nous avons essayé de nous rapprocher de la fonction \textit{pid\_t wait(int *\_Nullable wstatus);} du langage C, mais basée sur les processus et non pas les threads.
 
 \section{Limitations}
 \subsection{Partie I}
@@ -91,6 +107,7 @@ de trouver une page libre. Cependant, nous avons préféré le laisser ainsi, ca
 plus de possibilités que les accès mémoire des threads, locks, processus,... fonctionnent par "chance". Avec l'allocation
 aléatoire, il est beaucoup plus simple de trouver des erreurs si elles sont présentes.
 
+\subsection{Partie II}
 \subsubsection{Action II.6}
 La fonction \textit{ForceRelease} que nous avons implémentée casse le principe des locks, qui assure que seul le thread possédant le mutex peut le relâcher.
 C'est une solution brutale, qui n'a donc pas été implémentée coté utilisateur. Nous partons du principe que cette fonction ne doit être utilisé que
@@ -103,6 +120,18 @@ Comme discuté dans le rapport 2, la pile du dernier thread n'est pas libérée,
 du dernier \textit{AddrSpace} car on ne peut pas effectuer le \textit{Cleanup} de celui-ci. En revanche les autres espaces d'adressages créés pour les différents
 threads sont bien supprimés.
 
+\subsection{Partie III}
+Les principales limitations de notre implémentation sont dues à l'appel système \textit{wait} que nous avons créé. Par exemple l'appel 
+\textit{wait} rend impossible le fait de quitter le shell via un programme (car \textit{wait} attend d'être seul et aucun \textit{exit} 
+ne peut mettre fin à l'exécution du processus principal). L'unique moyen de terminer le programme était donc de faire un appel à \textit{halt},
+mais l'utilisation de cet appel système empêche une terminaison propre où la mémoire est correctement libérée. Nous avons défini que si la commande
+donnée par l'utilisateur est simplement un 'e', le shell faisait un appel à \textit{exit} pour terminer de manière 'basique'. L'appel système \textit{wait}
+ne nous permettant pas d'attendre la fin de l'exécution d'un processus en particulier, nous sommes obligés d'attendre que le shell soit seul à être exécuté
+sur la machine et nous ne pouvons pas lancer de commande en arrière-plan par exemple. Il est aussi discutable que seul un thread attende de faire partie de l'unique
+processus, car nous n'avons pas géré le cas ou ce thread se ferait tuer si son processus terminait. D'autres fonctionnalités basiques comme la redirection de l'entrée ou 
+sortie standard vers des fichiers ou encore les pipes ne sont donc pas disponibles. Nous avons également trouvé un bug mineur (uniquement graphique), si l'on tente d'exécuter
+un programme qui n'existe pas alors la console passera en rouge et ne reviendra pas au blanc, cela n'a cependant aucun impact sur le comportement du programme.
+
 \subsection{Fuites Mémoires}
 Les tests écrits combinés à \textit{Valgrind} nous ont permis d'identifier de nouvelles fuites mémoires. Même si nous avons pu corriger la plupart, car il s'agissait
 surtout d'objet C++ comme des \textit{Locks} que nous oublions de supprimer à la destruction du \textit{PageProvider}. Il reste toujours des fuites qui
@@ -114,13 +143,15 @@ exécuter \textit{GetString} et se mettre à attendre des caractères frappés a
 numéroté 2 et, par conséquent, n'exécutera jamais l'instruction 3 qui est la libération du buffer (le \textit{copyStringToMachine} n'est, lui aussi, jamais exécuté dans ce cas).
 Nous pouvons donc noter que ce type de fuites mémoires est lié au choix d'implémentation et ne peut être corrigé facilement. Il reste cependant très minoritaire, puisque dû à l'appel
 de \textit{force-release} qui est une procédure particulière.
-\subsection{Partie II}
 
-\subsection{Partie III}
+
 
 
 \section{Tests}
-Nos tests sont décrits en détail dans des commentaires présents dans leurs fichiers.
+Nos tests sont décrits en détail dans des commentaires présents dans leurs fichiers. De manière générale le test \textit{multipleprocesses} est celui que nous avons utilisé.
+Il présente les caractéristiques nécessaires pour vérifier qu'un processus fonctionne (il crée des threads dans chaque processus qu'il crée). Il est cependant nécessaire d'augmenter
+grandement le nombre de pages physiques disponibles (\textit{NumPhysPages} l.38 dans \textit{machine.h}) ainsi que la taille par défaut de la pile du processus (\textit{UserStacksAreaSize} 
+l.26 dans \textit{addrspace.h}).
 \subsection{Partie I}
 \subsubsection{Action I.3}
 Afin de tester notre nouvelle fonction \textit{ReadAtVirtual}, nous n'avons pas implémenté de nouveaux tests. Nous avons utilisé nos anciens programmes 
@@ -128,7 +159,9 @@ qui utilisaient \textit{PutString} et \textit{PutChar} afin de vérifier qu'il n
 
 \subsubsection{Action I.6}
 Lorsque nous avons commencé nos tests, nous avions beaucoup d'erreurs de segmentation. En effet, vu que nous faisions un \textit{Translate} qui n'avait pas lieu d'être, on se retrouvait souvent
-avec des valeurs incohérentes qui faisaient planter notre programme. Après avoir corrigé ce bug, nos tests se sont remis à fonctionner.
+avec des valeurs incohérentes qui faisaient planter notre programme. Après avoir corrigé ce bug, nos tests se sont remis à fonctionner. Nous avons également créé un test \textit{alloctypescomparison}
+qui créé quelques processus contenant des threads afin de visualiser les effets des différents types d'allocation sur la mémoire physique/virtuelle.
+Pour changer de méthode d'allocation, il suffit de dé commenter la ligne 142 de \textit{addrspace.cc} et de commenter la ligne suivante (Pour passer à l'allocation classique).
 
 \subsection{Partie II}
 
@@ -154,7 +187,11 @@ nous faisons un \textit{Exit} afin de supprimer brutalement le processus lorsque
 implémentation afin de ne pas se retrouver dans un deadlock ou de tenter de réveiller un thread tué.
 
 \subsection{Partie III}
-
+Le shell basique que nous avons codé se trouve dans le fichier \textit{shellV2.c}. Vous pouvez lancer n'importe quel programme contenu dans le 
+dossier test. Il n'était pas possible de faire de réel test avec le shell. Cependant, tous les programmes que nous avons écrits et testés ont eu le
+même comportement que lorsqu'ils sont lancé directement avec nachos. On peut donc considérer que celui-ci est correct (il gère les processus lançant
+plusieurs processus et plusieurs threads).
+\pagebreak
 \section{Annexes}
 \begin{figure}[h]
     \caption{Code responsable des fuites mémoires dans le test \textit{forcereleasetest}}
