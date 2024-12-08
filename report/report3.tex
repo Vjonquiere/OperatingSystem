@@ -40,11 +40,12 @@ l'on compare la mémoire physique et la mémoire virtuelle grâce à \textit{Dum
 \subsubsection{Action I.5}
 La création de la classe \textit{PageProvider} n'a pas vraiment posé de problème. Nous avons
 surtout réfléchi à quels paramètres donner à cet objet et que sauvegarder. Nous avons 
-adapté notre implémentation au fur a à mesure que nous trouvions des paramètres à rajouter.
+adapté notre implémentation au fur et à mesure que nous trouvions des paramètres à rajouter.
 Nous avons décidé de sécuriser notre implémentation avec des \textit{Mutex} dès le départ,
 même si l'arrivée des threads était dans les actions suivantes. Il ne faut qu'un seul \textit{PageProvider}
 car si chaque espace d'adressage avait son propre \textit{PageProvider}, il pourrait supprimer des
-pages qui ne lui appartiennent pas.
+pages qui ne lui appartiennent pas et il n'y aurait pas d'entente globale sur qui possède quelle page,
+et donc quelles pages sont libres pour un nouveau processus.
 
 \subsubsection{Action I.6}
 Nous avons passé beaucoup de temps sur cette action. Au départ, la pagination se faisait 
@@ -190,7 +191,9 @@ implémentation afin de ne pas se retrouver dans un deadlock ou de tenter de ré
 Le shell basique que nous avons codé se trouve dans le fichier \textit{shellV2.c}. Vous pouvez lancer n'importe quel programme contenu dans le 
 dossier test. Il n'était pas possible de faire de réel test avec le shell. Cependant, tous les programmes que nous avons écrits et testés ont eu le
 même comportement que lorsqu'ils sont lancé directement avec nachos. On peut donc considérer que celui-ci est correct (il gère les processus lançant
-plusieurs processus et plusieurs threads).
+plusieurs processus et plusieurs threads). Nous avons tout de même un problème avec les \textit{DumpMem} dans notre shell d'après \textit{Valgrind} puisque
+l'on trouve des 'Conditional jump or move depends on uninitialised value(s)' lors de l'exécution d'un nouveau programme. Nous n'avons cependant pas cherché à le corriger 
+par manque de temps et, car ce message ne mentionne que les \textit{DumpMem} (si on commente les \textit{DumpMem} il n'y a pas de problème de mémoire).
 \pagebreak
 \section{Annexes}
 \begin{figure}[h]
