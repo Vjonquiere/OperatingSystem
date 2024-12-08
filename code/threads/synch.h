@@ -154,6 +154,8 @@ class Condition:public dontcopythis
 
   private:
     const char *name;
+    List* waiting_threads;
+    bool locked;
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H

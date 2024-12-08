@@ -5,6 +5,7 @@
 
 #include "bitmap.h"
 class Lock;
+class Condition;
 
 
 class PageProvider:public dontcopythis
@@ -19,6 +20,9 @@ class PageProvider:public dontcopythis
         void AddNewProcess();
         void RemoveProcess();
         bool RemainingRunningProcess();
+        int RunningProcessCount();
+        Condition* processWait;
+        Lock* proc;
 
     private:
         BitMap* pageBitmap;

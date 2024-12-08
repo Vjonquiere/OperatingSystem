@@ -188,25 +188,47 @@ List* Lock::getQueue(){
 
 Condition::Condition (const char *debugName)
 {
-    (void) debugName;
-    ASSERT_MSG(FALSE, "TODO\n");
+    name = debugName;
+    locked = true;
+    waiting_threads = new List;
 }
 
 Condition::~Condition ()
 {
+    delete waiting_threads;
+    waiting_threads = NULL;
 }
 void
 Condition::Wait (Lock * conditionLock)
 {
-    (void) conditionLock;
-    ASSERT_MSG(FALSE, "TODO\n");
+    #ifdef CHANGED
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    waiting_threads->Append((void*)currentThread);
+    conditionLock->Release();
+    while (locked)
+      {
+        currentThread->Sleep ();
+      }
+    locked=true;
+    conditionLock->Acquire();
+    DEBUG('s', "[CONDITION] Thread %s existing wait\n", currentThread->getName());
+    (void) interrupt->SetLevel (oldLevel);
+    #endif
 }
 
 void
 Condition::Signal (Lock * conditionLock)
 {
-    (void) conditionLock;
-    ASSERT_MSG(FALSE, "TODO\n");
+    #ifdef CHANGED
+    IntStatus oldLevel = interrupt->SetLevel (IntOff); // stop the interrupst so the operation is "atomic"
+    locked = false;
+    Thread *thread = (Thread *) waiting_threads->Remove (); // wake up a thread waiting for the mutex
+    if (thread != NULL){
+        scheduler->ReadyToRun (thread);
+    }
+    conditionLock->Release();  
+    (void) interrupt->SetLevel (oldLevel);
+    #endif
 }
 void
 Condition::Broadcast (Lock * conditionLock)

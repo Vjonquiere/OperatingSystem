@@ -45,6 +45,7 @@
 #define SC_SemP 21
 #define SC_SemV 22
 #define SC_ForkExec 23
+#define SC_Wait 24
 #endif
 
 #ifdef IN_USER_MODE
@@ -160,6 +161,7 @@ sem_t SemaphoreCreate(int initialValue);
 void SemaphoreDelete(sem_t sem);
 void P(sem_t sem);
 void V(sem_t sem);
+void Wait();
 
 int ForkExec(const char *s);
 #endif // CHANGED

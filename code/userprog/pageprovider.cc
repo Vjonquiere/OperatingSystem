@@ -10,11 +10,15 @@ PageProvider::PageProvider(int numberPages, int sizePage, char* mainMemory){
     pageSize = sizePage;
     memory = mainMemory;
     remainingProcess = 1;
+    processWait = new Condition("ProcessWait");
+    proc = new Lock("Process");
 }
 
 PageProvider::~PageProvider(){
     delete pageBitmap;
     delete mutex;
+    delete processWait;
+    delete proc;
 }
 
 int PageProvider::GetEmptyPage(){
@@ -37,10 +41,10 @@ int PageProvider::GetRandomEmptyPage(){
     int index = random()%pageCount;
     mutex->Acquire();
     int pageInMem;
-    /*if (NumAvailPage() == 0){
+    if (pageBitmap->NumClear() == 0){
         mutex->Release();
         return -1;
-    }*/
+    }
     while (pageBitmap->Test(index)){
         index = random()%pageCount;
     }
@@ -85,6 +89,14 @@ bool PageProvider::RemainingRunningProcess(){
     bool remaining;
     mutex->Acquire();
     remaining =remainingProcess !=0;
+    mutex->Release();
+    return remaining;
+}
+
+int PageProvider::RunningProcessCount(){
+    bool remaining;
+    mutex->Acquire();
+    remaining =remainingProcess;
     mutex->Release();
     return remaining;
 }
