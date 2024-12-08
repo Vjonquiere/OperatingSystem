@@ -96,7 +96,7 @@ le mutex pour le placer à l'adresse de \textit{Release}. Cette solution étant 
 modification du registre, nous l'avons rapidement écartée.
 
 \subsubsection{Action II.7}
-Comme discuté dans le rapport 2, la pile du dernier thread n'est pas libérée, car il ne peut pas se supprimer lui-même. il y a aussi des fuites mémoires au niveau
+Comme discuté dans le rapport 2, la pile du dernier thread n'est pas libérée, car il ne peut pas se supprimer lui-même. Il y a aussi des fuites mémoires au niveau
 du dernier \textit{AddrSpace} car on ne peut pas effectuer le \textit{Cleanup} de celui-ci. En revanche les autres espaces d'adressages créés pour les différents
 threads sont bien supprimés.
 
@@ -107,7 +107,7 @@ surtout d'objet C++ comme des \textit{Locks} que nous oublions de supprimer à l
 \textit{Valgrind} nous annonce une perte définitive de 5 octets. Pour l'expliquer nous avons pris une capture d'écran du code responsable(Figure \ref{fig:fuites} en annexe).
 Comme on peut le voir, la ligne annotée 1 alloue bien un buffer dynamiquement (celui-ci devrait être rempli lors de l'appel a \textit{GetString}). Dans l'étape 2, le thread va bien
 exécuter \textit{GetString} et se mettre à attendre des caractères frappés au clavier. Cependant, pendant son attente le deuxième thread du processus va lui terminer le processus 
-(et donc lancer la procédure de destruction des threads et de \textit{force-release} des locks PutString et GetString). On voit donc que le thread ne reviendra jamais de l'appel
+(et donc lancer la procédure de destruction des threads et de \textit{force-release} des locks \textit{PutString} et \textit{GetString}). On voit donc que le thread ne reviendra jamais de l'appel
 numéroté 2 et, par conséquent, n'exécutera jamais l'instruction 3 qui est la libération du buffer (le \textit{copyStringToMachine} n'est, lui aussi, jamais exécuté dans ce cas).
 Nous pouvons donc noter que ce type de fuites mémoires est lié au choix d'implémentation et ne peut être corrigé facilement. Il reste cependant très minoritaire, puisque dû à l'appel
 de \textit{force-release} qui est une procédure particulière.
@@ -117,6 +117,7 @@ de \textit{force-release} qui est une procédure particulière.
 
 
 \section{Tests}
+Nos tests sont décrits en détail dans des commentaires présents dans leurs fichiers.
 \subsection{Partie I}
 \subsubsection{Action I.3}
 Afin de tester notre nouvelle fonction \textit{ReadAtVirtual}, nous n'avons pas implémenté de nouveaux tests. Nous avons utilisé nos anciens programmes 
@@ -127,6 +128,26 @@ Lorsque nous avons commencé nos tests, nous avions beaucoup d'erreurs de segmen
 avec des valeurs incohérentes qui faisaient planter notre programme. Après avoir corrigé ce bug, nos tests se sont remis à fonctionner.
 
 \subsection{Partie II}
+
+\subsubsection{Action II.1}
+Afin de tester notre première implémentation de \textit{ForkExec}, nous avons utilisé le programme de test noté dans le sujet.
+Nous n'avions pas observé de bug et sommes donc passés à la partie suivante afin de pouvoir tester nos programmes avec la terminaison.
+
+\subsubsection{Action II.2}
+Nous n'avons pas implémenté de nouveaux tests pour cette partie, nous avons seulement retiré le \textit{while(1)} du test de 
+l'action précédente et appelé d'autres programmes de test pour observer les retours.
+
+\subsubsection{Action II.3}
+Pour tester l'utilisation des threads dans les différents espaces d'adressage, nous avons utilisé le test présent dans le sujet.
+
+\subsubsection{Action II.6}
+Nous avons décidé de relâcher les verrous de \textit{PutString} et \textit{GetString} en cas de terminaison brutale d'un processus.
+Dans notre test, nous avons décidé de tester le release de  \textit{GetString}.
+Pour tester notre implémentation, nous avons testé l'utilisation de \textit{ForceRelease} (fonction non accessible coté utilisateur).
+Nous avons créé un programme qui crée un processus en appelant \textit{ForkExec} et qui créait un thread appelant  \textit{GetString}.
+Le processus crée créait deux threads qui appelaient  \textit{GetString} et  \textit{PutStrig}. Dans la fonction appelant \textit{PutString},
+nous faisons un \textit{Exit} afin de supprimer brutalement le processus lorsque la fonction termine. Ce test nous a permis de modifier notre 
+implémentation afin de ne pas se retrouver dans un deadlock ou de tenter de reveiller un thread tué.
 
 \subsection{Partie III}
 
