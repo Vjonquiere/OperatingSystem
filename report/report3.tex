@@ -27,6 +27,10 @@
 
 \section{Bilan}
 
+Pour ce troisième rendu, nous avons implémenté tous les bonus. Nous avons une nouvelle fois codé tout le début du projet ensemble,
+souvent sur un seul ordinateur. Nous nous sommes répartis le travail sur certains bonus.
+Les parties du code qui ne nous ont pas posé de problèmes particuliers ne sont pas mentionnées dans ce rapport.
+
 \section{Points Délicats}
 \subsection{Partie I}
 \subsubsection{Action I.2}
@@ -64,7 +68,6 @@ correspondances dans la mémoire physique. Nous avons testé les limites de notr
 en cherchant le maximum de processus pouvant être lancés en même temps, avec différents nombres
 de pages physiques.
 
-\subsubsection{Action II.2}
 
 \subsubsection{Action II.5}
 Afin de sauvegarder la liste des threads encore vivants d'un processus, nous avons créé un tableau de threads dans \textit{AddrSpace}.
@@ -141,13 +144,14 @@ l'action précédente et appelé d'autres programmes de test pour observer les r
 Pour tester l'utilisation des threads dans les différents espaces d'adressage, nous avons utilisé le test présent dans le sujet.
 
 \subsubsection{Action II.6}
+Pour tester cette action, nous utilisions le test \textit{forcerelease}, qui appelle un autre programme : \textit{testrelease}.
 Nous avons décidé de relâcher les verrous de \textit{PutString} et \textit{GetString} en cas de terminaison brutale d'un processus.
-Dans notre test, nous avons décidé de tester le release de  \textit{GetString}.
+Ici, nous avons décidé de tester le release de \textit{GetString}.
 Pour tester notre implémentation, nous avons testé l'utilisation de \textit{ForceRelease} (fonction non accessible coté utilisateur).
 Nous avons créé un programme qui crée un processus en appelant \textit{ForkExec} et qui créait un thread appelant  \textit{GetString}.
 Le processus crée créait deux threads qui appelaient  \textit{GetString} et  \textit{PutStrig}. Dans la fonction appelant \textit{PutString},
 nous faisons un \textit{Exit} afin de supprimer brutalement le processus lorsque la fonction termine. Ce test nous a permis de modifier notre 
-implémentation afin de ne pas se retrouver dans un deadlock ou de tenter de reveiller un thread tué.
+implémentation afin de ne pas se retrouver dans un deadlock ou de tenter de réveiller un thread tué.
 
 \subsection{Partie III}
 
