@@ -3,6 +3,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
 
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{ {./report3_res/} }
+
+
 \author{
     Valentin Jonquière,
     Mathilde Chollon
@@ -97,8 +102,15 @@ threads sont bien supprimés.
 
 \subsection{Fuites Mémoires}
 Les tests écrits combinés à \textit{Valgrind} nous ont permis d'identifier de nouvelles fuites mémoires. Même si nous avons pu corriger la plupart, car il s'agissait
-surtout d'objet C++ comme des \textit{Locks} que nous oublions de supprimer à la destruction du \textit{PageProvider} par exemple, il reste toujours des fuites qui
-(de part l'implémentation réalisée) ne pourrons pas être corrigées. 
+surtout d'objet C++ comme des \textit{Locks} que nous oublions de supprimer à la destruction du \textit{PageProvider}. Il reste toujours des fuites qui
+(de part l'implémentation choisie) ne pourrons pas être corrigées. Nous allons prendre l'exemple d'une fuite qui a lieux lors de l'exécution du test \textit{forcereleasetest} où
+\textit{Valgrind} nous annonce une perte définitive de 5 octets. Pour l'expliquer nous avons pris une capture d'écran du code responsable(Figure \ref{fig:fuites} en annexe).
+Comme on peut le voir, la ligne annotée 1 alloue bien un buffer dynamiquement (celui-ci devrait être rempli lors de l'appel a \textit{GetString}). Dans l'étape 2, le thread va bien
+exécuter \textit{GetString} et se mettre à attendre des caractères frappés au clavier. Cependant, pendant son attente le deuxième thread du processus va lui terminer le processus 
+(et donc lancer la procédure de destruction des threads et de \textit{force-release} des locks PutString et GetString). On voit donc que le thread ne reviendra jamais de l'appel
+numéroté 2 et, par conséquent, n'exécutera jamais l'instruction 3 qui est la libération du buffer (le \textit{copyStringToMachine} n'est, lui aussi, jamais exécuté dans ce cas).
+Nous pouvons donc noter que ce type de fuites mémoires est lié au choix d'implémentation et ne peut être corrigé facilement. Il reste cependant très minoritaire, puisque dû à l'appel
+de \textit{force-release} qui est une procédure particulière.
 \subsection{Partie II}
 
 \subsection{Partie III}
@@ -117,5 +129,13 @@ avec des valeurs incohérentes qui faisaient planter notre programme. Après avo
 \subsection{Partie II}
 
 \subsection{Partie III}
+
+\section{Annexes}
+\begin{figure}[h]
+    \caption{Code responsable des fuites mémoires dans le test \textit{forcereleasetest}}
+    \centering
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{Leak}
+    \label{fig:fuites}
+\end{figure}
 
 \end{document}
