@@ -94,6 +94,11 @@ modification du registre, nous l'avons rapidement écartée.
 Comme discuté dans le rapport 2, la pile du dernier thread n'est pas libérée, car il ne peut pas se supprimer lui-même. il y a aussi des fuites mémoires au niveau
 du dernier \textit{AddrSpace} car on ne peut pas effectuer le \textit{Cleanup} de celui-ci. En revanche les autres espaces d'adressages créés pour les différents
 threads sont bien supprimés.
+
+\subsection{Fuites Mémoires}
+Les tests écrits combinés à \textit{Valgrind} nous ont permis d'identifier de nouvelles fuites mémoires. Même si nous avons pu corriger la plupart, car il s'agissait
+surtout d'objet C++ comme des \textit{Locks} que nous oublions de supprimer à la destruction du \textit{PageProvider} par exemple, il reste toujours des fuites qui
+(de part l'implémentation réalisée) ne pourrons pas être corrigées. 
 \subsection{Partie II}
 
 \subsection{Partie III}
