@@ -101,6 +101,13 @@ threads sont bien supprimés.
 
 \section{Tests}
 \subsection{Partie I}
+\subsubsection{Action I.3}
+Afin de tester notre nouvelle fonction \textit{ReadAtVirtual}, nous n'avons pas implémenté de nouveaux tests. Nous avons utilisé nos anciens programmes 
+qui utilisaient \textit{PutString} et \textit{PutChar} afin de vérifier qu'il n'y avait pas de problème de lecture à de mauvais endroits de la mémoire.
+
+\subsubsection{Action I.6}
+Lorsque nous avons commencé nos tests, nous avions beaucoup d'erreurs de segmentation. En effet, vu que nous faisions un \textit{Translate} qui n'avait pas lieu d'être, on se retrouvait souvent
+avec des valeurs incohérentes qui faisaient planter notre programme. Après avoir corrigé ce bug, nos tests se sont remis à fonctionner.
 
 \subsection{Partie II}
 
