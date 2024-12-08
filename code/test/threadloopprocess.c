@@ -2,19 +2,11 @@
 #include "syscall.h"
 #include "vsprintf.h"
 
-sem_t mutex;
-
 void funcThread(void* a){
-    int i, j;
     PutChar((int)a);
-    
-
 }  
 
-
 int main(){
-    
-    mutex = SemaphoreCreate(1);
     ThreadCreate(funcThread,(void*)'B');
     ThreadCreate(funcThread,(void*)'A');
     ThreadCreate(funcThread,(void*)'C');
@@ -23,9 +15,6 @@ int main(){
     ThreadCreate(funcThread,(void*)'F');
     ThreadCreate(funcThread,(void*)'G');
     ThreadCreate(funcThread,(void*)'H');
-    
-    
-    //printf("TEST\n");
     ThreadExit();
     return 1;
 }
@@ -33,14 +22,11 @@ int main(){
 /*
 To lauch the test, go in the code folder and execute the makefile with the command make.
 then execute the following command:
-./userprog/nachos -rs 1234 -x test/threadloop
+./userprog/nachos -rs 1234 -x test/threadloopprocess
 
-This program tests the stack allocation of our threads. It creates three threads that just 
-count to 40 (it iterates on a local variable) in order to see if stack pointers are correctly
-allocated. You can see that each is going to have it own counter, and even tough there are 
-contexts switches, the enumeration returns to the good values when each thread is set to current.
-You can add -d s argument to see mutexes and threads operation or -d t to see context switches.
-
+This program only launch several threads. It is not very usefull alone because it does the same
+things as threadloop. It is used by multipleprocesses in order to test processes and thread
+on large almount.
 
 */
 #endif
